@@ -1,0 +1,54 @@
+---
+import { url } from '../lib/url';
+
+interface Props {
+  /** Filename inside public/logos. Falls back to a monogram when absent. */
+  logo?: string;
+  logoDark?: string;
+  /** Organisation name — used for the monogram and as the accessible name. */
+  name: string;
+  class?: string;
+}
+
+const { logo, logoDark, name, class: className = '' } = Astro.props as Props;
+
+/** Up to two initials, skipping the noise words in institution names. */
+const skip = new Set(['of', 'the', 'and', 'for', 'de', 'la']);
+const monogram = name
+  .split(/\s+/)
+  .filter((word) => word && !skip.has(word.toLowerCase()))
+  .slice(0, 2)
+  .map((word) => word[0]!.toUpperCase())
+  .join('');
+
+const chip =
+  'flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-[#ffffff] p-1.5';
+---
+
+{
+  logo ? (
+    <div class={`${chip} ${className}`}>
+      {/* The chip is always light, so one file works in both themes. */}
+      <img
+        src={url(`/logos/${logo}`)}
+        alt=""
+        class={logoDark ? 'h-full w-full object-contain dark:hidden' : 'h-full w-full object-contain'}
+        loading="lazy"
+        decoding="async"
+      />
+      {logoDark && (
+        <img
+          src={url(`/logos/${logoDark}`)}
+          alt=""
+          class="hidden h-full w-full object-contain dark:block"
+          loading="lazy"
+          decoding="async"
+        />
+      )}
+    </div>
+  ) : (
+    <div class={`${chip} ${className}`} aria-hidden="true">
+      <span class="font-display text-sm font-semibold text-[#5d5850]">{monogram}</span>
+    </div>
+  )
+}

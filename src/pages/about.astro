@@ -2,27 +2,28 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import Section from '../components/Section.astro';
 import Prose from '../components/Prose.astro';
+import Tag from '../components/Tag.astro';
+import LogoChip from '../components/LogoChip.astro';
 import { url } from '../lib/url';
+import { CV_PDF, CV_PDF_DOWNLOAD_NAME, hasCvPdf } from '../lib/cv';
 import { site, socials } from '../lib/site';
+import { formatRange } from '../lib/date';
+import { getPath, getStack } from '../lib/content';
 
 /**
- * This page is the narrative; /cv is the record. The education, experience,
- * volunteering and awards timelines live only on /cv — rendering them here as
- * well made this page a strict subset of that one, with nothing of its own.
+ * The narrative page. /cv holds the same education and experience grouped by
+ * type and carried in full; here they read as one trajectory, a line each with
+ * no bullets, and the detail lives one link away.
  */
-const glance = [
-  { term: 'Now', detail: site.role.affiliation },
-  { term: 'Studying', detail: site.role.study },
-  ...(site.location ? [{ term: 'Based', detail: site.location }] : []),
-  { term: 'Focus', detail: site.knowsAbout.join(' · ') },
-];
+const path = await getPath();
+const stack = await getStack();
 
 const profiles = socials.filter((s) => !s.href.startsWith('mailto:'));
 ---
 
 <PageLayout
   title="About"
-  description="Background, research interests, and how to get in touch."
+  description="Background, the path so far, tools I work with, and how to get in touch."
   lede="Placeholder standfirst — one or two sentences of real positioning copy will go here."
 >
   <Prose>
@@ -42,26 +43,69 @@ const profiles = socials.filter((s) => !s.href.startsWith('mailto:'));
     </p>
   </Prose>
 
-  <Section title="At a glance" class="mt-16">
-    <dl class="grid gap-x-8 gap-y-4 sm:grid-cols-[8rem_1fr]">
+  <Section title="Path" class="mt-16">
+    <ol class="space-y-1">
       {
-        glance.map((row) => (
-          <div class="sm:contents">
-            <dt class="text-sm text-faint sm:pt-0.5">{row.term}</dt>
-            <dd class="mt-0.5 text-muted sm:mt-0">{row.detail}</dd>
+        path.map((entry) => (
+          <li class="flex items-start gap-4 border-b border-border py-3 last:border-b-0">
+            <LogoChip logo={entry.logo} logoDark={entry.logoDark} name={entry.org} />
+
+            {/* Wraps rather than truncates: a clipped degree title loses the
+                part that identifies it. */}
+            <div class="min-w-0 flex-1 sm:flex sm:items-baseline sm:justify-between sm:gap-6">
+              <div class="min-w-0">
+                <p class="font-medium">{entry.title}</p>
+                <p class="text-sm text-muted">{entry.org}</p>
+              </div>
+              <p class="mt-1 shrink-0 text-sm tabular-nums text-faint sm:mt-0 sm:text-right">
+                {formatRange(entry.start, entry.end)}
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <p class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+      <a
+        href={url('/cv')}
+        class="text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
+      >
+        Full record, with detail, on the CV <span aria-hidden="true">→</span>
+      </a>
+      {
+        hasCvPdf && (
+          <a
+            href={url(`/${CV_PDF}`)}
+            download={CV_PDF_DOWNLOAD_NAME}
+            class="text-muted underline decoration-1 underline-offset-4 transition-colors hover:text-accent"
+          >
+            Download PDF
+          </a>
+        )
+      }
+    </p>
+  </Section>
+
+  <Section title="Tools I work with" class="mt-16">
+    <dl class="space-y-6">
+      {
+        stack.map((group) => (
+          <div class="sm:grid sm:grid-cols-[9rem_1fr] sm:gap-x-8">
+            <dt class="text-sm text-faint sm:pt-1">{group.data.label}</dt>
+            <dd class="mt-2 sm:mt-0">
+              <ul class="flex flex-wrap gap-1.5">
+                {group.data.items.map((item) => (
+                  <li>
+                    <Tag>{item}</Tag>
+                  </li>
+                ))}
+              </ul>
+            </dd>
           </div>
         ))
       }
     </dl>
-
-    <p class="mt-8">
-      <a
-        href={url('/cv')}
-        class="text-sm text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
-      >
-        Full record on the CV <span aria-hidden="true">→</span>
-      </a>
-    </p>
   </Section>
 
   <Section title="Get in touch" class="mt-16">

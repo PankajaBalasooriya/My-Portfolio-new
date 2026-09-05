@@ -1,0 +1,26 @@
+# PLACEHOLDER — replace with your real stack. Groups render in `order`.
+# Keep each group to roughly four to eight items; a long list reads as noise.
+- id: hardware
+  label: Hardware & EDA
+  order: 1
+  items: [KiCad, Altium Designer, STM32, ESP32, Signal integrity, Bring-up & debug]
+
+- id: firmware
+  label: Firmware
+  order: 2
+  items: [C, C++, FreeRTOS, Zephyr, Bare-metal drivers]
+
+- id: ml
+  label: Machine learning
+  order: 3
+  items: [Python, PyTorch, NumPy, Multi-agent RL, RLlib]
+
+- id: robotics
+  label: Robotics
+  order: 4
+  items: [ROS 2, Gazebo, Control systems, SLAM]
+
+- id: tooling
+  label: Tooling
+  order: 5
+  items: [Linux, Git, Docker, LaTeX, MATLAB]

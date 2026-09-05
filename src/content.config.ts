@@ -74,7 +74,10 @@ const experience = defineCollection({
     /** Omit for a role still held; renders as "Present". */
     end: monthString.optional(),
     bullets: z.array(z.string()).default([]),
+    /** Filename inside public/logos, e.g. "exertion-games-lab.svg". */
     logo: z.string().optional(),
+    /** Optional override for dark mode; rarely needed given the light chip. */
+    logoDark: z.string().optional(),
     order: z.number().optional(),
   }),
 });
@@ -88,6 +91,9 @@ const education = defineCollection({
     start: monthString,
     end: monthString.optional(),
     details: z.array(z.string()).default([]),
+    /** Filename inside public/logos, e.g. "university-of-moratuwa.svg". */
+    logo: z.string().optional(),
+    logoDark: z.string().optional(),
   }),
 });
 
@@ -106,6 +112,21 @@ const research = defineCollection({
     abstract: z.string().optional(),
     /** Optional link through to the project case study. */
     project: reference('projects').optional(),
+  }),
+});
+
+/**
+ * Tools and technologies, grouped by domain. Deliberately no proficiency
+ * scores: they are unverifiable, age badly, and say less than the grouping,
+ * which shows the span from hardware through firmware to learning.
+ */
+const stack = defineCollection({
+  loader: file('./src/data/stack.yaml'),
+  schema: z.object({
+    id: z.string(),
+    label: z.string(),
+    items: z.array(z.string()).min(1),
+    order: z.number().default(999),
   }),
 });
 
@@ -137,6 +158,7 @@ export const collections = {
   projects,
   experience,
   education,
+  stack,
   research,
   awards,
   volunteering,

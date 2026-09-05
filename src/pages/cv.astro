@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { site, socials } from '../lib/site';
 import { url } from '../lib/url';
+import { CV_PDF, CV_PDF_DOWNLOAD_NAME, hasCvPdf } from '../lib/cv';
 import { formatRange, formatMonth } from '../lib/date';
 import {
   getExperience,
@@ -24,12 +25,25 @@ const research = await getResearchByYear();
   <div class="cv mx-auto w-full max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
     <div class="no-print mb-10 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-border p-4 text-sm text-muted">
       <p>This page is laid out for printing — use your browser's print dialog to save a PDF.</p>
-      <a
-        href={url('/about')}
-        class="text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
-      >
-        Longer version on About
-      </a>
+      <span class="flex flex-wrap items-center gap-x-5 gap-y-2">
+        {
+          hasCvPdf && (
+            <a
+              href={url(`/${CV_PDF}`)}
+              download={CV_PDF_DOWNLOAD_NAME}
+              class="inline-block rounded-md bg-accent px-4 py-2 text-sm font-medium text-bg transition-colors hover:bg-accent-hover"
+            >
+              Download PDF
+            </a>
+          )
+        }
+        <a
+          href={url('/about')}
+          class="text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
+        >
+          Longer version on About
+        </a>
+      </span>
     </div>
 
     <header class="cv-header">

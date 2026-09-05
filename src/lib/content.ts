@@ -75,6 +75,61 @@ export async function getAwards(): Promise<CollectionEntry<'awards'>[]> {
   return awards.sort((a, b) => b.data.date.localeCompare(a.data.date));
 }
 
+/** Tool groups for the About page, in authored order. */
+export async function getStack(): Promise<CollectionEntry<'stack'>[]> {
+  const groups = await getCollection('stack');
+  return groups.sort((a, b) => a.data.order - b.data.order);
+}
+
+/**
+ * Education and experience merged into one recency-ordered path.
+ * /cv groups these by type and carries the detail; here they read as a single
+ * trajectory, one line each.
+ */
+export async function getPath(): Promise<
+  {
+    id: string;
+    kind: 'experience' | 'education';
+    title: string;
+    org: string;
+    logo?: string;
+    logoDark?: string;
+    start: string;
+    end?: string;
+  }[]
+> {
+  const [experience, education] = await Promise.all([getExperience(), getEducation()]);
+
+  const entries = [
+    ...experience.map((e) => ({
+      id: e.id,
+      kind: 'experience' as const,
+      title: e.data.role,
+      org: e.data.org,
+      logo: e.data.logo,
+      logoDark: e.data.logoDark,
+      start: e.data.start,
+      end: e.data.end,
+    })),
+    ...education.map((e) => ({
+      id: e.id,
+      kind: 'education' as const,
+      title: e.data.credential,
+      org: e.data.institution,
+      logo: e.data.logo,
+      logoDark: e.data.logoDark,
+      start: e.data.start,
+      end: e.data.end,
+    })),
+  ];
+
+  // Open-ended entries sort to the top; ties broken by start date.
+  return entries.sort(
+    (a, b) =>
+      (b.end ?? '9999').localeCompare(a.end ?? '9999') || b.start.localeCompare(a.start),
+  );
+}
+
 /** Every published post tag, with counts, alphabetical. */
 export async function getPostTags(): Promise<{ tag: string; count: number }[]> {
   const counts = new Map<string, number>();
