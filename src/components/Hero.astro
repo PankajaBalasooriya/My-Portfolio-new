@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import { site } from '../lib/site';
 import { url } from '../lib/url';
-import portrait from '../assets/placeholder/portrait.png';
+import portrait from '../assets/portrait.png';
 ---
 
 <section aria-labelledby="hero-heading">
@@ -44,12 +44,14 @@ import portrait from '../assets/placeholder/portrait.png';
     </div>
 
     <div class="order-1 shrink-0 sm:order-2">
+      {/* Keeps the source's 3:4 ratio at both sizes, so the photograph is
+          never cropped — only scaled. */}
       <Image
         src={portrait}
-        alt="Placeholder portrait — replace with a photograph of Pankaja Balasooriya."
-        widths={[192, 384, 448]}
-        sizes="(min-width: 640px) 14rem, 6rem"
-        class="h-24 w-24 rounded-full border border-border object-cover sm:h-56 sm:w-56 sm:rounded-lg"
+        alt="Pankaja Balasooriya, seated at a desk with a laptop."
+        widths={[224, 288, 416, 576]}
+        sizes="(min-width: 640px) 13rem, 7rem"
+        class="aspect-[3/4] w-28 rounded-lg border border-border object-cover sm:w-52"
         loading="eager"
         fetchpriority="high"
       />
