@@ -40,7 +40,7 @@
   --c-border: #e2ded5;        /* hairlines and dividers                      */
   --c-text: #1c1b19;          /* body copy                                   */
   --c-muted: #5d5850;         /* secondary copy — still AA for normal text   */
-  --c-faint: #857e73;         /* decorative only — never body text           */
+  --c-faint: #736d64;         /* de-emphasised meta text — AA at small sizes */
   --c-accent: #9a3412;        /* the one accent. Used sparingly.             */
   --c-accent-hover: #7c2d12;
   --c-accent-soft: #f0d9cf;   /* accent wash: chips, selection               */
@@ -54,7 +54,7 @@
   --c-border: #2f2f3a;
   --c-text: #eae8e3;
   --c-muted: #aeaaa2;
-  --c-faint: #7c776f;
+  --c-faint: #89847b;
   --c-accent: #f0a58a;        /* lightened — the light-mode sienna fails here */
   --c-accent-hover: #f6bda8;
   --c-accent-soft: #3a2a24;
