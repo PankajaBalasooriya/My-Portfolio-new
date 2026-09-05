@@ -1,0 +1,76 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Least privilege: read the repo, publish a Pages deployment, mint an OIDC token.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deployments race; queue instead of cancelling a live one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # `site` and `base` are resolved here rather than hardcoded in
+      # astro.config.mjs, so the domain cutover is a settings change and not a
+      # commit. Repository variables win when set; otherwise we fall back to
+      # the project-page preview URL derived from the repo itself.
+      #
+      # Cutover: set PUBLIC_SITE=https://pankajabalasooriya.me and
+      # PUBLIC_BASE=/ under Settings → Secrets and variables → Actions →
+      # Variables. See DEPLOY.md.
+      - name: Resolve site and base URLs
+        env:
+          VAR_SITE: ${{ vars.PUBLIC_SITE }}
+          VAR_BASE: ${{ vars.PUBLIC_BASE }}
+        run: |
+          set -euo pipefail
+          owner_lc="$(echo "${GITHUB_REPOSITORY%%/*}" | tr '[:upper:]' '[:lower:]')"
+          repo_name="${GITHUB_REPOSITORY#*/}"
+
+          site="${VAR_SITE:-https://${owner_lc}.github.io}"
+
+          if [ -n "${VAR_BASE:-}" ]; then
+            base="$VAR_BASE"
+          elif [ "$(echo "$repo_name" | tr '[:upper:]' '[:lower:]')" = "${owner_lc}.github.io" ]; then
+            # User/organisation site: served from the domain root.
+            base="/"
+          else
+            # Project site: served from https://<owner>.github.io/<repo>/
+            base="/${repo_name}/"
+          fi
+
+          echo "PUBLIC_SITE=$site" >> "$GITHUB_ENV"
+          echo "PUBLIC_BASE=$base" >> "$GITHUB_ENV"
+          echo "Building with site=$site base=$base"
+
+      - name: Build with Astro
+        uses: withastro/action@v3
+        with:
+          node-version: 22
+          package-manager: pnpm@11.25.0
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
