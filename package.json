@@ -12,7 +12,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "sync": "astro sync"
+    "sync": "astro sync",
+    "lighthouse": "node scripts/lighthouse.mjs",
+    "contrast": "node scripts/contrast.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.14",
@@ -27,6 +29,8 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "chrome-launcher": "^1.2.1",
+    "lighthouse": "^13.4.1",
     "typescript": "^5.9.3"
   }
 }
