@@ -1,16 +1,23 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Container from '../components/Container.astro';
+import Section from '../components/Section.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import PostCard from '../components/PostCard.astro';
+import ResearchEntry from '../components/ResearchEntry.astro';
 import { site } from '../lib/site';
 import { url } from '../lib/url';
+import { getFeaturedProjects, getResearch, getPosts } from '../lib/content';
+
+const featured = await getFeaturedProjects();
+const research = (await getResearch()).slice(0, 3);
+const posts = (await getPosts()).slice(0, 3);
 ---
 
 <BaseLayout title={site.title} description={site.description}>
-  <Container class="py-20 sm:py-28">
+  <Container class="py-16 sm:py-24">
     <section aria-labelledby="hero-heading">
-      <h1 id="hero-heading" class="text-4xl leading-[1.15] sm:text-5xl">
-        {site.name}
-      </h1>
+      <h1 id="hero-heading" class="text-4xl leading-[1.15] sm:text-5xl">{site.name}</h1>
       <p class="mt-6 max-w-[60ch] text-lg leading-relaxed text-muted sm:text-xl">
         {site.tagline}
       </p>
@@ -24,8 +31,42 @@ import { url } from '../lib/url';
       </p>
     </section>
 
-    <p class="mt-20 text-sm text-faint">
-      Featured projects, selected research, and latest posts land here in step (c).
-    </p>
+    {
+      featured.length > 0 && (
+        <Section title="Featured projects" href="/projects" linkLabel="All projects" class="mt-20">
+          <ul class="grid gap-6 sm:grid-cols-2">
+            {featured.map((project) => (
+              <li class="flex">
+                <ProjectCard project={project} headingLevel={3} />
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )
+    }
+
+    {
+      research.length > 0 && (
+        <Section title="Selected research" href="/research" linkLabel="All research" class="mt-20">
+          <div>
+            {research.map((entry) => (
+              <ResearchEntry entry={entry} compact />
+            ))}
+          </div>
+        </Section>
+      )
+    }
+
+    {
+      posts.length > 0 && (
+        <Section title="Latest writing" href="/blog" linkLabel="All posts" class="mt-20">
+          <div>
+            {posts.map((post) => (
+              <PostCard post={post} headingLevel={3} />
+            ))}
+          </div>
+        </Section>
+      )
+    }
   </Container>
 </BaseLayout>

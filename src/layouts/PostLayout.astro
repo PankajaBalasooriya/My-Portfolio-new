@@ -1,0 +1,99 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { MarkdownHeading } from 'astro';
+import { Image } from 'astro:assets';
+import BaseLayout from './BaseLayout.astro';
+import Container from '../components/Container.astro';
+import Prose from '../components/Prose.astro';
+import Tag from '../components/Tag.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import PrevNext from '../components/PrevNext.astro';
+import { formatDate, isoDate } from '../lib/date';
+import { readingTime } from '../lib/readingTime';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+  headings: MarkdownHeading[];
+  newer?: CollectionEntry<'blog'>;
+  older?: CollectionEntry<'blog'>;
+}
+
+const { post, headings, newer, older } = Astro.props as Props;
+const { title, description, pubDate, updatedDate, tags, heroImage, heroAlt, draft } = post.data;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  publishedTime={pubDate}
+  modifiedTime={updatedDate}
+  noindex={draft}
+>
+  <Container class="py-14 sm:py-20">
+    <article>
+      <header class="mb-10">
+        {
+          draft && (
+            <p class="mb-4 rounded-md border border-accent px-3 py-2 text-sm text-accent">
+              This is an unpublished draft.
+            </p>
+          )
+        }
+
+        <h1 class="text-3xl sm:text-4xl">{title}</h1>
+
+        <p class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-faint">
+          <time datetime={isoDate(pubDate)}>{formatDate(pubDate)}</time>
+          <span aria-hidden="true">·</span>
+          <span>{readingTime(post.body)}</span>
+          {
+            updatedDate && (
+              <>
+                <span aria-hidden="true">·</span>
+                <span>
+                  Updated <time datetime={isoDate(updatedDate)}>{formatDate(updatedDate)}</time>
+                </span>
+              </>
+            )
+          }
+        </p>
+
+        {
+          tags.length > 0 && (
+            <ul class="mt-4 flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <li>
+                  <Tag href={`/blog/tags/${tag}`}>{tag}</Tag>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+
+        {
+          heroImage && (
+            <Image
+              src={heroImage}
+              alt={heroAlt ?? ''}
+              widths={[640, 1280]}
+              sizes="(min-width: 768px) 48rem, 100vw"
+              class="mt-8 aspect-[16/9] w-full rounded-lg border border-border object-cover"
+              loading="eager"
+            />
+          )
+        }
+      </header>
+
+      <div class="mb-10">
+        <TableOfContents headings={headings} />
+      </div>
+
+      <Prose>
+        <slot />
+      </Prose>
+    </article>
+
+    <PrevNext newer={newer} older={older} />
+  </Container>
+</BaseLayout>

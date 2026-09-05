@@ -1,0 +1,43 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import Tag from '../../components/Tag.astro';
+import { getPosts, getPostTags } from '../../lib/content';
+
+const posts = await getPosts();
+const tags = await getPostTags();
+---
+
+<PageLayout
+  title="Writing"
+  description="Notes on electronics, embedded systems, machine learning, and research."
+  lede="Occasional notes on things I have built, broken, or read."
+>
+  {
+    tags.length > 0 && (
+      <nav aria-label="Post tags" class="mb-10">
+        <ul class="flex flex-wrap gap-2">
+          {tags.map(({ tag, count }) => (
+            <li>
+              <Tag href={`/blog/tags/${tag}`}>
+                {tag} <span class="text-faint">{count}</span>
+              </Tag>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )
+  }
+
+  {
+    posts.length > 0 ? (
+      <div>
+        {posts.map((post) => (
+          <PostCard post={post} />
+        ))}
+      </div>
+    ) : (
+      <p class="text-muted">No posts yet.</p>
+    )
+  }
+</PageLayout>
