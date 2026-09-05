@@ -1,0 +1,19 @@
+---
+/**
+ * A vertical rail joining the logo chips of its entries.
+ *
+ * The rail is drawn on the list itself rather than per entry, so it stops
+ * cleanly at the first and last chip centres (1.375rem — half of the chip's
+ * 2.75rem height) instead of overshooting past the ends.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props as Props;
+---
+
+<ol
+  class={`relative before:absolute before:left-[1.375rem] before:top-[1.375rem] before:bottom-[1.375rem] before:w-px before:bg-border ${className}`}
+>
+  <slot />
+</ol>

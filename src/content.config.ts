@@ -91,6 +91,14 @@ const education = defineCollection({
     start: monthString,
     end: monthString.optional(),
     details: z.array(z.string()).default([]),
+    /** Splits the Education section into higher education and school. */
+    kind: z.enum(['university', 'school']).default('university'),
+    location: z.string().optional(),
+    /**
+     * Ascending, applied before recency. Without it an ongoing minor outranks
+     * the primary degree, since open-ended entries sort to the top.
+     */
+    order: z.number().optional(),
     /** Filename inside public/logos, e.g. "university-of-moratuwa.svg". */
     logo: z.string().optional(),
     logoDark: z.string().optional(),

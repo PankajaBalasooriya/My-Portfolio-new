@@ -63,7 +63,12 @@ export async function getExperience(): Promise<CollectionEntry<'experience'>[]> 
 }
 
 export async function getEducation(): Promise<CollectionEntry<'education'>[]> {
-  return (await getCollection('education')).sort(byRecency);
+  const entries = await getCollection('education');
+  return entries.sort((a, b) => {
+    const aOrder = a.data.order ?? Number.MAX_SAFE_INTEGER;
+    const bOrder = b.data.order ?? Number.MAX_SAFE_INTEGER;
+    return aOrder - bOrder || byRecency(a, b);
+  });
 }
 
 export async function getVolunteering(): Promise<CollectionEntry<'volunteering'>[]> {
@@ -81,53 +86,16 @@ export async function getStack(): Promise<CollectionEntry<'stack'>[]> {
   return groups.sort((a, b) => a.data.order - b.data.order);
 }
 
-/**
- * Education and experience merged into one recency-ordered path.
- * /cv groups these by type and carries the detail; here they read as a single
- * trajectory, one line each.
- */
-export async function getPath(): Promise<
-  {
-    id: string;
-    kind: 'experience' | 'education';
-    title: string;
-    org: string;
-    logo?: string;
-    logoDark?: string;
-    start: string;
-    end?: string;
-  }[]
-> {
-  const [experience, education] = await Promise.all([getExperience(), getEducation()]);
-
-  const entries = [
-    ...experience.map((e) => ({
-      id: e.id,
-      kind: 'experience' as const,
-      title: e.data.role,
-      org: e.data.org,
-      logo: e.data.logo,
-      logoDark: e.data.logoDark,
-      start: e.data.start,
-      end: e.data.end,
-    })),
-    ...education.map((e) => ({
-      id: e.id,
-      kind: 'education' as const,
-      title: e.data.credential,
-      org: e.data.institution,
-      logo: e.data.logo,
-      logoDark: e.data.logoDark,
-      start: e.data.start,
-      end: e.data.end,
-    })),
-  ];
-
-  // Open-ended entries sort to the top; ties broken by start date.
-  return entries.sort(
-    (a, b) =>
-      (b.end ?? '9999').localeCompare(a.end ?? '9999') || b.start.localeCompare(a.start),
-  );
+/** Education split into higher education and school, each most recent first. */
+export async function getEducationByKind(): Promise<{
+  university: CollectionEntry<'education'>[];
+  school: CollectionEntry<'education'>[];
+}> {
+  const entries = await getEducation();
+  return {
+    university: entries.filter((e) => e.data.kind === 'university'),
+    school: entries.filter((e) => e.data.kind === 'school'),
+  };
 }
 
 /** Every published post tag, with counts, alphabetical. */

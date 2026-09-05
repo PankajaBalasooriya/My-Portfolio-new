@@ -1,17 +1,34 @@
 # PLACEHOLDER DATA — replace wholesale when real content lands.
 - id: lorem-university-beng
   institution: University of Lorem Ipsum
-  credential: BSc Eng (Hons) in Placeholder Engineering
+  credential: BSc Engineering (Hons) in Placeholder Engineering
+  kind: university
+  order: 1
+  location: Lorem, Ipsum
   start: 2022-02
   end: 2026-06
   details:
-    - Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit.
-    - Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.
+    - 'CGPA: 0.00/4.00 (up to semester 7)'
+    - 'Key courses: Nemo Enim Ipsam, Voluptatem Quia, Voluptas Sit Aspernatur'
+    - "Dean's List: semesters 2, 4, 5"
+
+- id: lorem-university-minor
+  institution: Department of Placeholders, University of Lorem Ipsum
+  credential: Minor in Placeholder Studies
+  kind: university
+  order: 2
+  location: Lorem, Ipsum
+  start: 2023-02
+  details:
+    - 'CGPA: 0.00/4.00 (up to semester 7)'
+    - 'Key courses: Neque Porro, Quisquam Est, Dolorem Ipsum'
 
 - id: dolor-college-secondary
   institution: Dolor Sit Amet College
   credential: Placeholder Secondary Certificate
-  start: 2017-01
-  end: 2021-12
+  kind: school
+  location: Dolor, Amet
+  start: 2012-01
+  end: 2020-10
   details:
     - At vero eos et accusamus et iusto odio dignissimos ducimus.
