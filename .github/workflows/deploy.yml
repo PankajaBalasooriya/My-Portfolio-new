@@ -70,7 +70,53 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # Reports only. `continue-on-error` keeps a regression — or a flaky run on a
+  # shared runner — from failing the workflow or blocking the deployment, which
+  # has already happened by this point. Scores land in the run summary.
+  lighthouse:
+    name: Lighthouse (non-blocking)
+    needs: deploy
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node and pnpm
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable pnpm
+        run: corepack enable pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Audit the deployed site
+        env:
+          TARGET_URL: ${{ needs.deploy.outputs.page_url }}
+        run: |
+          # No `set -e`: a below-threshold audit must still write the summary.
+          set +e -u
+          echo "## Lighthouse" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Audited \`$TARGET_URL\` — median of 3 runs, mobile emulation, throttled." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          pnpm lighthouse --url "$TARGET_URL" --runs 3 --verbose 2>&1 | tee -a "$GITHUB_STEP_SUMMARY"
+          status=${PIPESTATUS[0]}
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          if [ "$status" -ne 0 ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "> One or more categories fell below the threshold. This job is" \
+                 "advisory and does not block the deployment." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit 0
