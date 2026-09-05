@@ -1,19 +1,72 @@
 ---
-/**
- * A vertical rail joining the logo chips of its entries.
- *
- * The rail is drawn on the list itself rather than per entry, so it stops
- * cleanly at the first and last chip centres (1.375rem — half of the chip's
- * 2.75rem height) instead of overshooting past the ends.
- */
+import TimelineEntry from './TimelineEntry.astro';
+import { formatRangeShort, formatDuration, monthIndex, nowIndex } from '../lib/date';
+
+export interface TimelineItem {
+  org: string;
+  role: string;
+  location?: string;
+  start: string;
+  end?: string;
+  details?: string[];
+  logo?: string;
+  logoDark?: string;
+}
+
 interface Props {
+  entries: TimelineItem[];
+  /** 3 directly under a section, 4 when nested under a sub-heading. */
+  headingLevel?: 3 | 4;
   class?: string;
 }
-const { class: className = '' } = Astro.props as Props;
+
+const { entries, headingLevel = 3, class: className = '' } = Astro.props as Props;
+
+/**
+ * The span bars are scaled to this list, not to the page. Sharing one scale
+ * across work and education would squash a run of internships against a
+ * decade of schooling and show nothing useful.
+ */
+const bounds = entries.reduce(
+  (acc, entry) => ({
+    from: Math.min(acc.from, monthIndex(entry.start)),
+    to: Math.max(acc.to, entry.end ? monthIndex(entry.end) : nowIndex()),
+  }),
+  { from: Infinity, to: -Infinity },
+);
+
+const total = Math.max(1, bounds.to - bounds.from);
+
+function span(entry: TimelineItem) {
+  const start = monthIndex(entry.start);
+  const end = entry.end ? monthIndex(entry.end) : nowIndex();
+  return {
+    left: ((start - bounds.from) / total) * 100,
+    // A floor so a one-month entry is still a visible mark rather than a hairline.
+    width: Math.max(3, ((end - start) / total) * 100),
+  };
+}
 ---
 
+{/* The rail is drawn on the list so it stops at the first and last chip
+    centres (1.375rem — half the chip's height) instead of overshooting. */}
 <ol
   class={`relative before:absolute before:left-[1.375rem] before:top-[1.375rem] before:bottom-[1.375rem] before:w-px before:bg-border ${className}`}
 >
-  <slot />
+  {
+    entries.map((entry) => (
+      <TimelineEntry
+        org={entry.org}
+        role={entry.role}
+        location={entry.location}
+        period={formatRangeShort(entry.start, entry.end)}
+        duration={formatDuration(entry.start, entry.end)}
+        span={span(entry)}
+        details={entry.details}
+        logo={entry.logo}
+        logoDark={entry.logoDark}
+        headingLevel={headingLevel}
+      />
+    ))
+  }
 </ol>

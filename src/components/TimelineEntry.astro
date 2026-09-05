@@ -2,17 +2,18 @@
 import LogoChip from './LogoChip.astro';
 
 interface Props {
-  /** The organisation or institution — the entry's heading. */
   org: string;
-  /** Role or credential. */
   role: string;
   location?: string;
   /** Pre-formatted, e.g. "December 2024 — July 2025". */
   period: string;
+  /** Pre-formatted, e.g. "8 mos". */
+  duration?: string;
+  /** Percentages of the parent Timeline's shared scale. */
+  span?: { left: number; width: number };
   details?: string[];
   logo?: string;
   logoDark?: string;
-  /** 3 directly under a section, 4 when nested under a sub-heading. */
   headingLevel?: 3 | 4;
 }
 
@@ -21,6 +22,8 @@ const {
   role,
   location,
   period,
+  duration,
+  span,
   details = [],
   logo,
   logoDark,
@@ -37,15 +40,31 @@ const Heading = `h${headingLevel}` as keyof astroHTML.JSX.DefinedIntrinsicElemen
   </div>
 
   <div class="min-w-0 flex-1">
-    <div class="sm:flex sm:items-baseline sm:justify-between sm:gap-6">
-      <Heading class="font-display text-lg leading-snug">{org}</Heading>
-      <p class="mt-1 shrink-0 text-sm tabular-nums text-faint sm:mt-0 sm:text-right">
-        {period}
-      </p>
-    </div>
+    <div class="sm:flex sm:items-start sm:justify-between sm:gap-6">
+      <div class="min-w-0 sm:pt-0.5">
+        <Heading class="font-display text-lg leading-snug">{org}</Heading>
+        <p class="mt-1 text-accent">{role}</p>
+        {location && <p class="mt-0.5 text-sm text-faint">{location}</p>}
+      </div>
 
-    <p class="mt-1 text-accent">{role}</p>
-    {location && <p class="mt-0.5 text-sm text-faint">{location}</p>}
+      <div class="mt-2 shrink-0 sm:mt-0 sm:w-40 sm:text-right">
+        <p class="text-sm tabular-nums text-faint">{period}</p>
+        {duration && <p class="mt-0.5 text-xs text-faint">{duration}</p>}
+
+        {
+          /* The bar repeats what the dates already say, so it is hidden from
+             assistive tech rather than announced as a second, vaguer copy. */
+          span && (
+            <div class="mt-2 h-[3px] w-full rounded-full bg-border" aria-hidden="true">
+              <div
+                class="h-full rounded-full bg-muted"
+                style={`margin-left:${span.left.toFixed(2)}%;width:${span.width.toFixed(2)}%`}
+              />
+            </div>
+          )
+        }
+      </div>
+    </div>
 
     {
       details.length > 0 && (

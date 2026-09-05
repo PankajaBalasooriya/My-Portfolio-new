@@ -4,16 +4,37 @@ import Section from '../components/Section.astro';
 import Prose from '../components/Prose.astro';
 import Tag from '../components/Tag.astro';
 import Timeline from '../components/Timeline.astro';
-import TimelineEntry from '../components/TimelineEntry.astro';
+import type { TimelineItem } from '../components/Timeline.astro';
 import { url } from '../lib/url';
 import { CV_PDF, CV_PDF_DOWNLOAD_NAME, hasCvPdf } from '../lib/cv';
 import { site, socials } from '../lib/site';
-import { formatRange } from '../lib/date';
 import { getExperience, getEducationByKind, getStack } from '../lib/content';
 
 const stack = await getStack();
 const experience = await getExperience();
 const education = await getEducationByKind();
+
+const workEntries: TimelineItem[] = experience.map((entry) => ({
+  org: entry.data.org,
+  role: entry.data.role,
+  location: entry.data.location,
+  start: entry.data.start,
+  end: entry.data.end,
+  details: entry.data.bullets,
+  logo: entry.data.logo,
+  logoDark: entry.data.logoDark,
+}));
+
+const toEducationEntry = (entry: (typeof education.university)[number]): TimelineItem => ({
+  org: entry.data.institution,
+  role: entry.data.credential,
+  location: entry.data.location,
+  start: entry.data.start,
+  end: entry.data.end,
+  details: entry.data.details,
+  logo: entry.data.logo,
+  logoDark: entry.data.logoDark,
+});
 
 const profiles = socials.filter((s) => !s.href.startsWith('mailto:'));
 ---
@@ -62,44 +83,14 @@ const profiles = socials.filter((s) => !s.href.startsWith('mailto:'));
   </Section>
 
   <Section title="Work experience" class="mt-16">
-    <Timeline>
-      {
-        experience.map((entry) => (
-          <TimelineEntry
-            org={entry.data.org}
-            role={entry.data.role}
-            location={entry.data.location}
-            period={formatRange(entry.data.start, entry.data.end)}
-            details={entry.data.bullets}
-            logo={entry.data.logo}
-            logoDark={entry.data.logoDark}
-            headingLevel={3}
-          />
-        ))
-      }
-    </Timeline>
+    <Timeline entries={workEntries} headingLevel={3} />
   </Section>
 
   <Section title="Education" class="mt-16">
     <h3 class="mb-5 font-display text-sm font-semibold uppercase tracking-widest text-faint">
       Higher education
     </h3>
-    <Timeline>
-      {
-        education.university.map((entry) => (
-          <TimelineEntry
-            org={entry.data.institution}
-            role={entry.data.credential}
-            location={entry.data.location}
-            period={formatRange(entry.data.start, entry.data.end)}
-            details={entry.data.details}
-            logo={entry.data.logo}
-            logoDark={entry.data.logoDark}
-            headingLevel={4}
-          />
-        ))
-      }
-    </Timeline>
+    <Timeline entries={education.university.map(toEducationEntry)} headingLevel={4} />
 
     {
       education.school.length > 0 && (
@@ -107,20 +98,7 @@ const profiles = socials.filter((s) => !s.href.startsWith('mailto:'));
           <h3 class="mb-5 mt-12 font-display text-sm font-semibold uppercase tracking-widest text-faint">
             School
           </h3>
-          <Timeline>
-            {education.school.map((entry) => (
-              <TimelineEntry
-                org={entry.data.institution}
-                role={entry.data.credential}
-                location={entry.data.location}
-                period={formatRange(entry.data.start, entry.data.end)}
-                details={entry.data.details}
-                logo={entry.data.logo}
-                logoDark={entry.data.logoDark}
-                headingLevel={4}
-              />
-            ))}
-          </Timeline>
+          <Timeline entries={education.school.map(toEducationEntry)} headingLevel={4} />
         </>
       )
     }
