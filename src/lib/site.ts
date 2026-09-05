@@ -60,6 +60,9 @@ export const nav = [
   { label: 'CV', href: '/cv' },
 ] as const;
 
+/** Checked against the ORCID public API: the record's name matches. */
+export const ORCID = '0009-0009-4550-2470';
+
 /**
  * `verified: true` means the URL has been confirmed to resolve to this person.
  * Only verified profiles are published as schema.org `sameAs`, because a wrong
@@ -68,8 +71,15 @@ export const nav = [
  */
 export const socials = [
   { label: 'GitHub', href: 'https://github.com/PankajaBalasooriya', verified: true },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/pankajabalasooriya', verified: false },
-  { label: 'Scholar', href: 'https://scholar.google.com/', verified: false },
+  // Supplied by the site owner. LinkedIn answers automated requests with 999,
+  // so it cannot be machine-checked the way the others were.
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/pankajabalasooriya', verified: true },
+  {
+    label: 'Scholar',
+    href: 'https://scholar.google.com/citations?user=gKDoXuAAAAAJ&hl=en',
+    verified: true,
+  },
+  { label: 'ORCID', href: `https://orcid.org/${ORCID}`, verified: true },
   { label: 'Email', href: `mailto:${site.author.email}`, verified: true },
 ] as const;
 
