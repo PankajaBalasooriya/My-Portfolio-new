@@ -106,8 +106,10 @@ what visitors actually get.
 
 ## 3. Cutting over to pankajabalasooriya.me
 
-Do these in order. Steps 1–2 are safe and reversible; the site keeps serving
-from the old host until DNS propagates in step 3.
+Do these in order. Steps 3.1–3.2 are safe and reversible — the old site keeps
+serving throughout. Step 3.3 starts a short window where the domain serves
+nothing, ending when step 3.4 completes and the certificate is issued. Expect
+roughly five to fifteen minutes, dominated by certificate issuance.
 
 ### 3.1 Add the CNAME file
 
@@ -141,34 +143,36 @@ resolved values:
 Building with site=https://pankajabalasooriya.me base=/
 ```
 
-### 3.3 Point DNS at GitHub Pages
+### 3.3 Release the domain from the old repository
 
-At your DNS provider, replace the records currently pointing at the old site.
+**No DNS changes are needed.** `pankajabalasooriya.me` already resolves to
+GitHub Pages — the apex carries GitHub's four A records and `www` is a CNAME to
+`pankajabalasooriya.github.io`. The domain is currently claimed by the
+**`my-portfolio-astro`** repository, and GitHub allows only one repository to
+hold a custom domain at a time.
 
-Apex (`pankajabalasooriya.me`) — four `A` records and four `AAAA` records:
+So, in the OLD repo (`my-portfolio-astro`):
+**Settings → Pages → Custom domain →** clear the field → Save.
 
-```
-A     185.199.108.153
-A     185.199.109.153
-A     185.199.110.153
-A     185.199.111.153
-AAAA  2606:50c0:8000::153
-AAAA  2606:50c0:8001::153
-AAAA  2606:50c0:8002::153
-AAAA  2606:50c0:8003::153
-```
-
-Optionally, `www` as a `CNAME` to `pankajabalasooriya.github.io.`
-
-> These are GitHub's published Pages IPs, but they do change occasionally —
-> confirm against GitHub's "Managing a custom domain for your GitHub Pages
-> site" docs before you edit records.
-
-Check propagation:
+Verify it is released (expect a 404 while the domain is unclaimed):
 
 ```bash
-dig +short pankajabalasooriya.me
+curl -sI https://pankajabalasooriya.me | head -1
 ```
+
+Only after this will the new repository accept the domain; otherwise GitHub
+rejects it with "already in use by another repository".
+
+For reference, should DNS ever need rebuilding from scratch, the apex needs
+these A records (and `www` as a CNAME to `pankajabalasooriya.github.io`):
+
+```
+185.199.108.153   185.199.109.153   185.199.110.153   185.199.111.153
+```
+
+Optional, unrelated to cutover: the apex has no AAAA records, so the site is
+IPv4-only. GitHub's Pages IPv6 addresses can be added in Namecheap's Advanced
+DNS at any time. Confirm current values against GitHub's docs first.
 
 ### 3.4 Set the custom domain in Pages
 
