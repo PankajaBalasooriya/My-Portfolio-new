@@ -28,6 +28,11 @@ export const site = {
   /** Used for schema.org jobTitle. */
   jobTitle: 'Research Intern',
   /**
+   * Optional. Shown in the About page's at-a-glance block when set, and left
+   * out entirely when empty — deliberately blank rather than guessed.
+   */
+  location: '' as string,
+  /**
    * Verified against the live sites: mrt.ac.lk and exertiongameslab.org both
    * resolve and their titles match. uom.lk does not resolve — do not use it.
    */

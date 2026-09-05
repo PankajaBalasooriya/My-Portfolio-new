@@ -2,20 +2,27 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import Section from '../components/Section.astro';
 import Prose from '../components/Prose.astro';
-import TimelineItem from '../components/TimelineItem.astro';
 import { url } from '../lib/url';
-import { formatRange, formatMonth } from '../lib/date';
-import { getExperience, getEducation, getVolunteering, getAwards } from '../lib/content';
+import { site, socials } from '../lib/site';
 
-const experience = await getExperience();
-const education = await getEducation();
-const volunteering = await getVolunteering();
-const awards = await getAwards();
+/**
+ * This page is the narrative; /cv is the record. The education, experience,
+ * volunteering and awards timelines live only on /cv — rendering them here as
+ * well made this page a strict subset of that one, with nothing of its own.
+ */
+const glance = [
+  { term: 'Now', detail: site.role.affiliation },
+  { term: 'Studying', detail: site.role.study },
+  ...(site.location ? [{ term: 'Based', detail: site.location }] : []),
+  { term: 'Focus', detail: site.knowsAbout.join(' · ') },
+];
+
+const profiles = socials.filter((s) => !s.href.startsWith('mailto:'));
 ---
 
 <PageLayout
   title="About"
-  description="Background, education, experience, and awards."
+  description="Background, research interests, and how to get in touch."
   lede="Placeholder standfirst — one or two sentences of real positioning copy will go here."
 >
   <Prose>
@@ -35,73 +42,56 @@ const awards = await getAwards();
     </p>
   </Prose>
 
-  <Section title="Education" class="mt-16">
-    <ul>
+  <Section title="At a glance" class="mt-16">
+    <dl class="grid gap-x-8 gap-y-4 sm:grid-cols-[8rem_1fr]">
       {
-        education.map((entry) => (
-          <TimelineItem
-            title={entry.data.credential}
-            subtitle={entry.data.institution}
-            period={formatRange(entry.data.start, entry.data.end)}
-            bullets={entry.data.details}
-          />
+        glance.map((row) => (
+          <div class="sm:contents">
+            <dt class="text-sm text-faint sm:pt-0.5">{row.term}</dt>
+            <dd class="mt-0.5 text-muted sm:mt-0">{row.detail}</dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <p class="mt-8">
+      <a
+        href={url('/cv')}
+        class="text-sm text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
+      >
+        Full record on the CV <span aria-hidden="true">→</span>
+      </a>
+    </p>
+  </Section>
+
+  <Section title="Get in touch" class="mt-16">
+    <p class="max-w-[60ch] text-muted">
+      Email is the best way to reach me. I am also on the networks below.
+    </p>
+
+    <p class="mt-6">
+      <a
+        href={`mailto:${site.author.email}`}
+        class="inline-block rounded-md bg-accent px-4 py-2 text-sm font-medium text-bg transition-colors hover:bg-accent-hover"
+      >
+        {site.author.email}
+      </a>
+    </p>
+
+    <ul class="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+      {
+        profiles.map((profile) => (
+          <li>
+            <a
+              href={profile.href}
+              rel="me noopener"
+              class="text-muted underline decoration-1 underline-offset-4 transition-colors hover:text-accent"
+            >
+              {profile.label}
+            </a>
+          </li>
         ))
       }
     </ul>
   </Section>
-
-  <Section title="Experience" class="mt-16">
-    <ul>
-      {
-        experience.map((entry) => (
-          <TimelineItem
-            title={entry.data.role}
-            subtitle={entry.data.org}
-            meta={entry.data.location}
-            period={formatRange(entry.data.start, entry.data.end)}
-            bullets={entry.data.bullets}
-          />
-        ))
-      }
-    </ul>
-  </Section>
-
-  <Section title="Volunteering" class="mt-16">
-    <ul>
-      {
-        volunteering.map((entry) => (
-          <TimelineItem
-            title={entry.data.role}
-            subtitle={entry.data.org}
-            period={formatRange(entry.data.start, entry.data.end)}
-            description={entry.data.description}
-          />
-        ))
-      }
-    </ul>
-  </Section>
-
-  <Section title="Awards" class="mt-16">
-    <ul>
-      {
-        awards.map((entry) => (
-          <TimelineItem
-            title={entry.data.title}
-            subtitle={entry.data.issuer}
-            period={formatMonth(entry.data.date)}
-            description={entry.data.description}
-          />
-        ))
-      }
-    </ul>
-  </Section>
-
-  <p class="mt-16 text-sm text-muted">
-    A condensed, print-friendly version is on the
-    <a
-      href={url('/cv')}
-      class="text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
-      >CV page</a
-    >.
-  </p>
 </PageLayout>
