@@ -1,0 +1,22 @@
+# PLACEHOLDER DATA — replace wholesale when real content lands.
+- id: lorem-labs-intern
+  org: Lorem Ipsum Research Lab
+  role: Placeholder Research Intern
+  location: Dolor Sit, Amet
+  start: 2025-01
+  order: 1
+  bullets:
+    - Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.
+    - Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+    - Duis aute irure dolor in reprehenderit in voluptate velit esse.
+
+- id: dolor-systems-engineer
+  org: Dolor Systems (Pvt) Ltd
+  role: Placeholder Embedded Engineering Trainee
+  location: Consectetur, Elit
+  start: 2024-06
+  end: 2024-12
+  order: 2
+  bullets:
+    - Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
+    - Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium.

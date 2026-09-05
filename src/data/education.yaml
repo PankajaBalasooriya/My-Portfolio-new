@@ -1,0 +1,17 @@
+# PLACEHOLDER DATA — replace wholesale when real content lands.
+- id: lorem-university-beng
+  institution: University of Lorem Ipsum
+  credential: BSc Eng (Hons) in Placeholder Engineering
+  start: 2022-02
+  end: 2026-06
+  details:
+    - Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit.
+    - Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.
+
+- id: dolor-college-secondary
+  institution: Dolor Sit Amet College
+  credential: Placeholder Secondary Certificate
+  start: 2017-01
+  end: 2021-12
+  details:
+    - At vero eos et accusamus et iusto odio dignissimos ducimus.

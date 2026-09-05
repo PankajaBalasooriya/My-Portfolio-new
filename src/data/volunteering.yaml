@@ -1,0 +1,15 @@
+# PLACEHOLDER DATA — replace wholesale when real content lands.
+- id: lorem-robotics-mentor
+  org: Lorem Robotics Outreach
+  role: Placeholder Mentor
+  start: 2024-02
+  description: >-
+    Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam
+    nihil molestiae consequatur.
+
+- id: dolor-society-committee
+  org: Dolor Student Society
+  role: Placeholder Committee Member
+  start: 2023-05
+  end: 2024-05
+  description: Temporibus autem quibusdam et aut officiis debitis aut rerum.

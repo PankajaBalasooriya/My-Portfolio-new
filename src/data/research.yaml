@@ -1,0 +1,30 @@
+# PLACEHOLDER DATA — replace wholesale when real content lands.
+- id: lorem-haptic-feedback
+  title: "Lorem Ipsum: On the Haptic Affordances of Placeholder Text"
+  authors:
+    - Placeholder A. Author
+    - Second B. Author
+    - Third C. Author
+  venue: Proceedings of the Conference on Imaginary Systems (CHI-ish)
+  year: 2026
+  type: paper
+  doi: 10.0000/lorem.2026.000001
+  code: https://github.com/example/lorem-haptics
+  project: lorem-project
+  abstract: >-
+    Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium
+    doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore
+    veritatis et quasi architecto beatae vitae dicta sunt explicabo.
+
+- id: dolor-swarm-demo
+  title: "Dolor Sit: A Demonstration of Placeholder Multi-Agent Coordination"
+  authors:
+    - Placeholder A. Author
+    - Fourth D. Author
+  venue: Workshop on Fictional Robotics (WFR)
+  year: 2025
+  type: demo
+  pdf: /papers/dolor-swarm-demo.pdf
+  abstract: >-
+    Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis
+    suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur.
