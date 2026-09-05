@@ -66,6 +66,28 @@ PUBLIC_SITE=https://pankajabalasooriya.github.io PUBLIC_BASE=/My-Portfolio-new/ 
 
 Serve the result with `pnpm preview`.
 
+### Quality gates
+
+```bash
+pnpm check        # astro check — types across .astro/.ts
+pnpm contrast     # WCAG AA contrast for every palette pair, both themes
+pnpm lighthouse   # Lighthouse against the production build (needs Chrome)
+```
+
+`pnpm contrast` reads the tokens straight out of `src/styles/global.css`, so it
+re-checks the real palette after you retheme rather than a copy that can drift.
+
+`pnpm lighthouse` builds nothing itself — run `pnpm build` first. It boots
+`astro preview`, audits with mobile emulation and throttling, and exits non-zero
+if any category falls below 95.
+
+```bash
+pnpm lighthouse --path /blog          # a different route
+pnpm lighthouse --url https://...     # a deployed URL instead of the preview
+pnpm lighthouse --verbose             # list every failing audit
+pnpm lighthouse --min 90              # lower the bar
+```
+
 ---
 
 ## 3. Cutting over to pankajabalasooriya.me
