@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Container from '../components/Container.astro';
+import { site } from '../lib/site';
+import { url } from '../lib/url';
+---
+
+<BaseLayout title={site.title} description={site.description}>
+  <Container class="py-20 sm:py-28">
+    <section aria-labelledby="hero-heading">
+      <h1 id="hero-heading" class="text-4xl leading-[1.15] sm:text-5xl">
+        {site.name}
+      </h1>
+      <p class="mt-6 max-w-[60ch] text-lg leading-relaxed text-muted sm:text-xl">
+        {site.tagline}
+      </p>
+      <p class="mt-8">
+        <a
+          href={url('/about')}
+          class="text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
+        >
+          More about me
+        </a>
+      </p>
+    </section>
+
+    <p class="mt-20 text-sm text-faint">
+      Featured projects, selected research, and latest posts land here in step (c).
+    </p>
+  </Container>
+</BaseLayout>

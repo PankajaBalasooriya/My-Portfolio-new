@@ -1,0 +1,26 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Container from '../components/Container.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Shown under the page heading; falls back to nothing. */
+  lede?: string;
+  width?: 'prose' | 'wide';
+  image?: string;
+  noindex?: boolean;
+}
+
+const { title, description, lede, width = 'wide', image, noindex } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} image={image} noindex={noindex}>
+  <Container width={width} class="py-14 sm:py-20">
+    <header class="mb-12">
+      <h1 class="text-3xl sm:text-4xl">{title}</h1>
+      {lede && <p class="mt-4 max-w-[60ch] text-lg text-muted">{lede}</p>}
+    </header>
+    <slot />
+  </Container>
+</BaseLayout>

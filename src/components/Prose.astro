@@ -1,0 +1,129 @@
+---
+/**
+ * Long-form typography. Hand-rolled rather than @tailwindcss/typography so the
+ * palette variables stay the single source of colour (and no extra dependency).
+ */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<div class={`prose-body ${className}`}>
+  <slot />
+</div>
+
+<style>
+  .prose-body {
+    max-width: 68ch;
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: var(--c-text);
+  }
+
+  .prose-body :global(> * + *) {
+    margin-top: 1.25em;
+  }
+
+  .prose-body :global(h2) {
+    margin-top: 2.5em;
+    margin-bottom: 0.6em;
+    font-size: 1.5rem;
+  }
+
+  .prose-body :global(h3) {
+    margin-top: 2em;
+    margin-bottom: 0.5em;
+    font-size: 1.2rem;
+  }
+
+  .prose-body :global(a) {
+    color: var(--c-accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  .prose-body :global(a:hover) {
+    color: var(--c-accent-hover);
+  }
+
+  .prose-body :global(strong) {
+    font-weight: 600;
+  }
+
+  .prose-body :global(ul),
+  .prose-body :global(ol) {
+    padding-left: 1.4em;
+  }
+
+  .prose-body :global(ul) {
+    list-style: disc;
+  }
+
+  .prose-body :global(ol) {
+    list-style: decimal;
+  }
+
+  .prose-body :global(li + li) {
+    margin-top: 0.4em;
+  }
+
+  .prose-body :global(li::marker) {
+    color: var(--c-faint);
+  }
+
+  .prose-body :global(blockquote) {
+    border-left: 2px solid var(--c-accent);
+    padding-left: 1.1em;
+    font-style: italic;
+    color: var(--c-muted);
+  }
+
+  .prose-body :global(code) {
+    background-color: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: 4px;
+    padding: 0.1em 0.35em;
+    font-size: 0.875em;
+  }
+
+  .prose-body :global(pre) {
+    background-color: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: 8px;
+    padding: 1rem 1.1rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .prose-body :global(pre code) {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  .prose-body :global(img) {
+    border-radius: 8px;
+    border: 1px solid var(--c-border);
+  }
+
+  .prose-body :global(hr) {
+    margin-block: 2.5em;
+  }
+
+  .prose-body :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+  }
+
+  .prose-body :global(th),
+  .prose-body :global(td) {
+    border-bottom: 1px solid var(--c-border);
+    padding: 0.5em 0.75em;
+    text-align: left;
+  }
+</style>

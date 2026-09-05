@@ -1,0 +1,38 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import ThemeScript from '../components/ThemeScript.astro';
+import SkipLink from '../components/SkipLink.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../lib/site';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  publishedTime?: Date;
+  modifiedTime?: Date;
+  noindex?: boolean;
+  /** Chrome-free shell, for the print CV. */
+  bare?: boolean;
+}
+
+const { bare = false, ...head } = Astro.props;
+---
+
+<!doctype html>
+<html lang={site.locale}>
+  <head>
+    <ThemeScript />
+    <BaseHead {...head} />
+  </head>
+  <body class="flex min-h-screen flex-col">
+    <SkipLink />
+    {!bare && <Header />}
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    {!bare && <Footer />}
+  </body>
+</html>

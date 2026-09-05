@@ -1,0 +1,48 @@
+---
+import { nav, site } from '../lib/site';
+import { url, isActive } from '../lib/url';
+import ThemeToggle from './ThemeToggle.astro';
+
+const current = Astro.url.pathname;
+---
+
+<header class="border-b border-border">
+  <div
+    class="mx-auto flex w-full max-w-3xl flex-wrap items-center gap-x-6 gap-y-3 px-5 py-5 sm:px-8"
+  >
+    <a
+      href={url('/')}
+      class="mr-auto font-display text-lg font-semibold tracking-tight transition-colors hover:text-accent"
+      aria-current={isActive(current, '/') ? 'page' : undefined}
+    >
+      {site.shortName}
+    </a>
+
+    {/* Full-width second row on mobile; inline before the toggle from `sm` up. */}
+    <nav aria-label="Primary" class="order-last -mx-2 w-full sm:order-none sm:w-auto">
+      <ul class="flex flex-wrap items-center gap-x-1 gap-y-1 px-2 text-sm">
+        {
+          nav.map((item) => {
+            const active = isActive(current, item.href);
+            return (
+              <li>
+                <a
+                  href={url(item.href)}
+                  aria-current={active ? 'page' : undefined}
+                  class:list={[
+                    'block rounded-md px-2 py-1 whitespace-nowrap transition-colors hover:text-accent',
+                    active ? 'font-medium text-text' : 'text-muted',
+                  ]}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </nav>
+
+    <ThemeToggle />
+  </div>
+</header>

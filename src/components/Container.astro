@@ -1,0 +1,20 @@
+---
+interface Props {
+  /** `prose` clamps to ~68ch for long-form reading; `wide` for grids. */
+  width?: 'prose' | 'wide';
+  /** Swap the wrapper element when the container is itself a landmark. */
+  as?: keyof astroHTML.JSX.DefinedIntrinsicElements;
+  class?: string;
+}
+
+const { width = 'wide', as: Tag = 'div', class: className = '' } = Astro.props as Props;
+
+const widths: Record<NonNullable<Props['width']>, string> = {
+  prose: 'max-w-[68ch]',
+  wide: 'max-w-3xl',
+};
+---
+
+<Tag class={`mx-auto w-full px-5 sm:px-8 ${widths[width]} ${className}`}>
+  <slot />
+</Tag>

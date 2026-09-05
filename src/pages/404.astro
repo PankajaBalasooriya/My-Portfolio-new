@@ -1,0 +1,20 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { url } from '../lib/url';
+---
+
+<PageLayout
+  title="Page not found"
+  description="That page does not exist."
+  lede="The page you were looking for isn’t here."
+  noindex
+>
+  <p>
+    <a
+      href={url('/')}
+      class="text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
+    >
+      Back to the homepage
+    </a>
+  </p>
+</PageLayout>

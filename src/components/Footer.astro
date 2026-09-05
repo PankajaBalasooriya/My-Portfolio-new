@@ -1,0 +1,35 @@
+---
+import { socials, site } from '../lib/site';
+import { url } from '../lib/url';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-24 border-t border-border">
+  <div
+    class="mx-auto flex w-full max-w-3xl flex-col gap-4 px-5 py-10 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-8"
+  >
+    <p>© {year} {site.name}</p>
+
+    <nav aria-label="Elsewhere">
+      <ul class="flex flex-wrap items-center gap-x-5 gap-y-2">
+        {
+          socials.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class="transition-colors hover:text-accent"
+                rel={item.href.startsWith('http') ? 'me noopener' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a href={url('/rss.xml')} class="transition-colors hover:text-accent">RSS</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</footer>
