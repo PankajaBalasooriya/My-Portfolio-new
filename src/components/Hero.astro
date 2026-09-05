@@ -1,8 +1,35 @@
 ---
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
 import { site } from '../lib/site';
 import { url } from '../lib/url';
-import portrait from '../assets/portrait.png';
+import portraitTall from '../assets/portrait.png';
+import portraitWide from '../assets/portrait-landscape.png';
+
+/**
+ * Art direction, not just resizing: the narrow viewport gets the landscape
+ * crop full-width so the subject sits centred, while `sm` and up gets the 3:4
+ * portrait beside the text. <picture> means only the matching source is
+ * fetched — Astro's <Image> can only vary size, not the image itself.
+ */
+const wide = await getImage({
+  src: portraitWide,
+  // `width` fixes what the plain `src` fallback points at. Without it Astro
+  // falls back to the full 2752px render (~220 KB) for any client that ignores
+  // srcset; 828 is the widest a phone actually needs.
+  width: 828,
+  widths: [420, 640, 828, 1120],
+  sizes: '100vw',
+  format: 'webp',
+});
+
+const tall = await getImage({
+  src: portraitTall,
+  widths: [224, 288, 416, 576],
+  sizes: '13rem',
+  format: 'webp',
+});
+
+const alt = 'Pankaja Balasooriya, seated at a desk with a laptop.';
 ---
 
 <section aria-labelledby="hero-heading">
@@ -43,18 +70,28 @@ import portrait from '../assets/portrait.png';
       </div>
     </div>
 
-    <div class="order-1 shrink-0 sm:order-2">
-      {/* Keeps the source's 3:4 ratio at both sizes, so the photograph is
-          never cropped — only scaled. */}
-      <Image
-        src={portrait}
-        alt="Pankaja Balasooriya, seated at a desk with a laptop."
-        widths={[224, 288, 416, 576]}
-        sizes="(min-width: 640px) 13rem, 7rem"
-        class="aspect-[3/4] w-28 rounded-lg border border-border object-cover sm:w-52"
-        loading="eager"
-        fetchpriority="high"
-      />
+    <div class="order-1 w-full shrink-0 sm:order-2 sm:w-auto">
+      <picture>
+        <source
+          media="(min-width: 640px)"
+          srcset={tall.srcSet.attribute}
+          sizes="13rem"
+          width={tall.attributes.width}
+          height={tall.attributes.height}
+        />
+        <img
+          src={wide.src}
+          srcset={wide.srcSet.attribute}
+          sizes="100vw"
+          width={wide.attributes.width}
+          height={wide.attributes.height}
+          alt={alt}
+          class="aspect-[16/9] w-full rounded-lg border border-border object-cover sm:aspect-[3/4] sm:w-52"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </picture>
     </div>
   </div>
 
