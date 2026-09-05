@@ -1,0 +1,26 @@
+---
+/**
+ * Blocking theme resolution. MUST be rendered in <head> before any stylesheet
+ * so the correct class is on <html> before first paint. This is what prevents
+ * the flash of wrong theme; do not defer it, move it, or bundle it.
+ */
+---
+
+<script is:inline>
+  (function () {
+    try {
+      var stored = localStorage.getItem('theme');
+      var theme =
+        stored === 'light' || stored === 'dark'
+          ? stored
+          : window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
+      var root = document.documentElement;
+      root.classList.toggle('dark', theme === 'dark');
+      root.style.colorScheme = theme;
+    } catch (e) {
+      /* private mode / storage disabled: fall through to the light default */
+    }
+  })();
+</script>
