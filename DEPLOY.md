@@ -170,9 +170,33 @@ these A records (and `www` as a CNAME to `pankajabalasooriya.github.io`):
 185.199.108.153   185.199.109.153   185.199.110.153   185.199.111.153
 ```
 
-Optional, unrelated to cutover: the apex has no AAAA records, so the site is
-IPv4-only. GitHub's Pages IPv6 addresses can be added in Namecheap's Advanced
-DNS at any time. Confirm current values against GitHub's docs first.
+#### IPv6 (dual-stack)
+
+`www` already answers over IPv6 — it is a CNAME to `pankajabalasooriya.github.io`,
+which carries AAAA records. The apex needs its own AAAA records, added in
+Namecheap → Advanced DNS as four `AAAA Record` entries on host `@`:
+
+```
+2606:50c0:8000::153   2606:50c0:8001::153
+2606:50c0:8002::153   2606:50c0:8003::153
+```
+
+Keep the A records — this is dual-stack, and removing them breaks IPv4 visitors.
+
+These are published by GitHub as /128 host addresses. Re-verify before relying
+on them; both sources are authoritative and take a second to check:
+
+```bash
+curl -s https://api.github.com/meta | python3 -c "import sys,json;print(json.load(sys.stdin)['pages'])"
+dig +short pankajabalasooriya.github.io AAAA
+```
+
+Confirm the result once propagated:
+
+```bash
+dig +short pankajabalasooriya.me AAAA
+curl -6 -sI https://pankajabalasooriya.me | head -1
+```
 
 ### 3.4 Set the custom domain in Pages
 
