@@ -148,6 +148,34 @@
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Cross-document view transitions. Native CSS only: Astro's ClientRouter would
+   ship a router's worth of JavaScript, and the theme toggle stays the only
+   script on the site. Unsupported browsers simply navigate as before.
+   --------------------------------------------------------------------------- */
+@view-transition {
+  navigation: auto;
+}
+
+/* The site chrome stays put instead of cross-fading with the page body. */
+[data-site-header] {
+  view-transition-name: site-header;
+}
+
+[data-site-footer] {
+  view-transition-name: site-footer;
+}
+
+/* The `*` reduced-motion rule in @layer base cannot reach these pseudo-elements,
+   so they need an explicit opt-out. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
 /* Shiki dual-theme: the light theme ships as the default, the dark theme as
    a CSS variable we swap under .dark. Keeps code blocks flash-free too. */
 .dark .astro-code,
