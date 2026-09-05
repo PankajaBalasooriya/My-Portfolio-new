@@ -1,0 +1,306 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site, socials } from '../lib/site';
+import { url } from '../lib/url';
+import { formatRange, formatMonth } from '../lib/date';
+import {
+  getExperience,
+  getEducation,
+  getVolunteering,
+  getAwards,
+  getResearchByYear,
+} from '../lib/content';
+
+const experience = await getExperience();
+const education = await getEducation();
+const volunteering = await getVolunteering();
+const awards = await getAwards();
+const research = await getResearchByYear();
+
+/** Screen chrome is hidden in print; the CV is the whole page on paper. */
+---
+
+<BaseLayout title="CV" description={`Curriculum vitae for ${site.name}.`}>
+  <div class="cv mx-auto w-full max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
+    <div class="no-print mb-10 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-border p-4 text-sm text-muted">
+      <p>This page is laid out for printing — use your browser's print dialog to save a PDF.</p>
+      <a
+        href={url('/about')}
+        class="text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
+      >
+        Longer version on About
+      </a>
+    </div>
+
+    <header class="cv-header">
+      <h1 class="text-3xl sm:text-4xl">{site.name}</h1>
+      <p class="mt-2 max-w-[60ch] text-muted">{site.description}</p>
+      <ul class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
+        {
+          socials.map((item) => (
+            <li>
+              <a href={item.href} class="cv-link hover:text-accent">
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </header>
+
+    <section aria-labelledby="cv-education" class="cv-section">
+      <h2 id="cv-education" class="cv-h2">Education</h2>
+      <ul>
+        {
+          education.map((entry) => (
+            <li class="cv-item">
+              <div class="cv-row">
+                <div>
+                  <p class="font-medium">{entry.data.credential}</p>
+                  <p class="text-muted">{entry.data.institution}</p>
+                </div>
+                <p class="cv-period">{formatRange(entry.data.start, entry.data.end)}</p>
+              </div>
+              {entry.data.details.length > 0 && (
+                <ul class="cv-bullets">
+                  {entry.data.details.map((detail) => (
+                    <li>{detail}</li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section aria-labelledby="cv-experience" class="cv-section">
+      <h2 id="cv-experience" class="cv-h2">Experience</h2>
+      <ul>
+        {
+          experience.map((entry) => (
+            <li class="cv-item">
+              <div class="cv-row">
+                <div>
+                  <p class="font-medium">{entry.data.role}</p>
+                  <p class="text-muted">
+                    {entry.data.org} · {entry.data.location}
+                  </p>
+                </div>
+                <p class="cv-period">{formatRange(entry.data.start, entry.data.end)}</p>
+              </div>
+              {entry.data.bullets.length > 0 && (
+                <ul class="cv-bullets">
+                  {entry.data.bullets.map((bullet) => (
+                    <li>{bullet}</li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section aria-labelledby="cv-research" class="cv-section">
+      <h2 id="cv-research" class="cv-h2">Research</h2>
+      {
+        research.map(({ year, items }) => (
+          <ul>
+            {items.map((entry) => (
+              <li class="cv-item">
+                <div class="cv-row">
+                  <div>
+                    <p class="font-medium">{entry.data.title}</p>
+                    <p class="text-muted">{entry.data.authors.join(', ')}</p>
+                    <p class="text-muted">
+                      <cite class="not-italic">{entry.data.venue}</cite> · {entry.data.type}
+                      {entry.data.doi && <span class="cv-doi"> · doi:{entry.data.doi}</span>}
+                    </p>
+                  </div>
+                  <p class="cv-period">{year}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ))
+      }
+    </section>
+
+    <section aria-labelledby="cv-awards" class="cv-section">
+      <h2 id="cv-awards" class="cv-h2">Awards</h2>
+      <ul>
+        {
+          awards.map((entry) => (
+            <li class="cv-item">
+              <div class="cv-row">
+                <div>
+                  <p class="font-medium">{entry.data.title}</p>
+                  <p class="text-muted">{entry.data.issuer}</p>
+                  {entry.data.description && <p class="text-muted">{entry.data.description}</p>}
+                </div>
+                <p class="cv-period">{formatMonth(entry.data.date)}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section aria-labelledby="cv-volunteering" class="cv-section">
+      <h2 id="cv-volunteering" class="cv-h2">Volunteering</h2>
+      <ul>
+        {
+          volunteering.map((entry) => (
+            <li class="cv-item">
+              <div class="cv-row">
+                <div>
+                  <p class="font-medium">{entry.data.role}</p>
+                  <p class="text-muted">{entry.data.org}</p>
+                  {entry.data.description && <p class="text-muted">{entry.data.description}</p>}
+                </div>
+                <p class="cv-period">{formatRange(entry.data.start, entry.data.end)}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .cv-section {
+    margin-top: 2.5rem;
+  }
+
+  .cv-h2 {
+    border-bottom: 1px solid var(--c-border);
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--c-faint);
+  }
+
+  .cv-item {
+    padding-block: 0.85rem;
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  .cv-item:last-child {
+    border-bottom: 0;
+  }
+
+  .cv-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .cv-period {
+    flex-shrink: 0;
+    font-size: 0.875rem;
+    color: var(--c-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cv-bullets {
+    margin-top: 0.5rem;
+    padding-left: 1.15rem;
+    list-style: disc;
+    color: var(--c-muted);
+  }
+
+  .cv-bullets li + li {
+    margin-top: 0.3rem;
+  }
+
+  @media (min-width: 640px) {
+    .cv-row {
+      flex-direction: row;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+    .cv-period {
+      text-align: right;
+    }
+  }
+
+  /* ---------------------------------------------------------------------
+     Print. Site chrome goes, the palette collapses to black on white, and
+     link targets are spelled out since a printed link can't be clicked.
+     --------------------------------------------------------------------- */
+  @media print {
+    .cv {
+      max-width: none;
+      padding: 0;
+      font-size: 10.5pt;
+      line-height: 1.45;
+    }
+
+    .cv-section {
+      margin-top: 1.4rem;
+      break-inside: avoid;
+    }
+
+    .cv-item {
+      break-inside: avoid;
+      padding-block: 0.5rem;
+    }
+
+    .cv-h2 {
+      font-size: 8.5pt;
+      break-after: avoid;
+    }
+
+    .cv-link[href^='http']::after,
+    .cv-link[href^='mailto']::after {
+      content: ' (' attr(href) ')';
+      font-size: 8pt;
+      color: #444;
+      word-break: break-all;
+    }
+  }
+</style>
+
+<style is:global>
+  @media print {
+    /* Force the light palette: printers do not honour colour-scheme. */
+    :root,
+    .dark {
+      --c-bg: #ffffff;
+      --c-surface: #ffffff;
+      --c-border: #cccccc;
+      --c-text: #000000;
+      --c-muted: #333333;
+      --c-faint: #555555;
+      --c-accent: #000000;
+      --c-accent-hover: #000000;
+    }
+
+    html,
+    body {
+      background: #fff !important;
+      color: #000 !important;
+    }
+
+    header:has(nav[aria-label='Primary']),
+    footer,
+    .no-print,
+    astro-dev-toolbar {
+      display: none !important;
+    }
+
+    main {
+      margin: 0 !important;
+    }
+
+    @page {
+      margin: 14mm;
+    }
+  }
+</style>

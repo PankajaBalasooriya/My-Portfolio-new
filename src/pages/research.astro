@@ -1,0 +1,35 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import ResearchEntry from '../components/ResearchEntry.astro';
+import { getResearchByYear } from '../lib/content';
+
+const byYear = await getResearchByYear();
+---
+
+<PageLayout
+  title="Research"
+  description="Publications, demos, posters, and preprints."
+  lede="Papers, demos, and posters, most recent first."
+>
+  {
+    byYear.length > 0 ? (
+      byYear.map(({ year, items }) => (
+        <section aria-labelledby={`year-${year}`} class="mb-14 last:mb-0">
+          <h2
+            id={`year-${year}`}
+            class="mb-4 border-b border-border pb-2 font-display text-sm font-semibold uppercase tracking-widest text-faint"
+          >
+            {year}
+          </h2>
+          <div>
+            {items.map((entry) => (
+              <ResearchEntry entry={entry} />
+            ))}
+          </div>
+        </section>
+      ))
+    ) : (
+      <p class="text-muted">Nothing published yet.</p>
+    )
+  }
+</PageLayout>

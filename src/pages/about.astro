@@ -1,0 +1,107 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Section from '../components/Section.astro';
+import Prose from '../components/Prose.astro';
+import TimelineItem from '../components/TimelineItem.astro';
+import { url } from '../lib/url';
+import { formatRange, formatMonth } from '../lib/date';
+import { getExperience, getEducation, getVolunteering, getAwards } from '../lib/content';
+
+const experience = await getExperience();
+const education = await getEducation();
+const volunteering = await getVolunteering();
+const awards = await getAwards();
+---
+
+<PageLayout
+  title="About"
+  description="Background, education, experience, and awards."
+  lede="Placeholder standfirst — one or two sentences of real positioning copy will go here."
+>
+  <Prose>
+    <p>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+      labore et dolore magna aliqua. This long-form biography is placeholder text and will be
+      replaced with real copy.
+    </p>
+    <p>
+      Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+      commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+      dolore eu fugiat nulla pariatur.
+    </p>
+    <p>
+      Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
+      anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem.
+    </p>
+  </Prose>
+
+  <Section title="Education" class="mt-16">
+    <ul>
+      {
+        education.map((entry) => (
+          <TimelineItem
+            title={entry.data.credential}
+            subtitle={entry.data.institution}
+            period={formatRange(entry.data.start, entry.data.end)}
+            bullets={entry.data.details}
+          />
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section title="Experience" class="mt-16">
+    <ul>
+      {
+        experience.map((entry) => (
+          <TimelineItem
+            title={entry.data.role}
+            subtitle={entry.data.org}
+            meta={entry.data.location}
+            period={formatRange(entry.data.start, entry.data.end)}
+            bullets={entry.data.bullets}
+          />
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section title="Volunteering" class="mt-16">
+    <ul>
+      {
+        volunteering.map((entry) => (
+          <TimelineItem
+            title={entry.data.role}
+            subtitle={entry.data.org}
+            period={formatRange(entry.data.start, entry.data.end)}
+            description={entry.data.description}
+          />
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section title="Awards" class="mt-16">
+    <ul>
+      {
+        awards.map((entry) => (
+          <TimelineItem
+            title={entry.data.title}
+            subtitle={entry.data.issuer}
+            period={formatMonth(entry.data.date)}
+            description={entry.data.description}
+          />
+        ))
+      }
+    </ul>
+  </Section>
+
+  <p class="mt-16 text-sm text-muted">
+    A condensed, print-friendly version is on the
+    <a
+      href={url('/cv')}
+      class="text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
+      >CV page</a
+    >.
+  </p>
+</PageLayout>
