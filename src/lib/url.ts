@@ -16,9 +16,22 @@ export function url(path = '/'): string {
   return joined === '' ? '/' : joined;
 }
 
-/** Absolute URL against the configured `site`, for canonicals and OG tags. */
+/**
+ * Absolute URL for a site-root-relative path (base path applied).
+ * Use for links you author, e.g. absoluteUrl('/og-default.png', Astro.site).
+ */
 export function absoluteUrl(path: string, site: URL | undefined): string {
   return new URL(url(path), site).href;
+}
+
+/**
+ * Absolute URL for a pathname that ALREADY includes the base path — notably
+ * `Astro.url.pathname`. Passing that through absoluteUrl() would apply the
+ * base twice, which is invisible at base='/' and breaks every canonical and
+ * og:url under a subpath.
+ */
+export function absoluteFromPathname(pathname: string, site: URL | undefined): string {
+  return new URL(pathname, site).href;
 }
 
 /** Strip the base path and any trailing slash, for nav active-state checks. */
