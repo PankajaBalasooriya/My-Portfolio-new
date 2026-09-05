@@ -1,0 +1,74 @@
+---
+import { Image } from 'astro:assets';
+import { site } from '../lib/site';
+import { url } from '../lib/url';
+import portrait from '../assets/placeholder/portrait.png';
+---
+
+<section aria-labelledby="hero-heading">
+  <div class="flex flex-col gap-8 sm:flex-row sm:items-start sm:gap-12">
+    {/* Text is first in the DOM so the h1 leads; CSS order puts the portrait
+        on top at mobile widths and to the right from `sm` up. */}
+    <div class="order-2 min-w-0 flex-1 sm:order-1">
+      <p class="text-xs font-medium uppercase tracking-[0.18em] text-faint">
+        {site.name}
+      </p>
+
+      <h1 id="hero-heading" class="hero-title mt-3">
+        {site.hero.headline}
+      </h1>
+
+      <p class="mt-5 max-w-[50ch] text-lg leading-relaxed text-muted">
+        {site.hero.sub}
+      </p>
+
+      <p class="mt-5 max-w-[52ch] text-sm text-faint">
+        {site.role.study}<span class="mx-1.5" aria-hidden="true">·</span
+        >{site.role.affiliation}
+      </p>
+
+      <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <a
+          href={url('/projects')}
+          class="rounded-md bg-accent px-4 py-2 text-sm font-medium text-bg transition-colors hover:bg-accent-hover"
+        >
+          View projects
+        </a>
+        <a
+          href={url('/cv')}
+          class="text-sm text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
+        >
+          Read the CV <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="order-1 shrink-0 sm:order-2">
+      <Image
+        src={portrait}
+        alt="Placeholder portrait — replace with a photograph of Pankaja Balasooriya."
+        widths={[192, 384, 448]}
+        sizes="(min-width: 640px) 14rem, 6rem"
+        class="h-24 w-24 rounded-full border border-border object-cover sm:h-56 sm:w-56 sm:rounded-lg"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </div>
+  </div>
+
+  <hr class="mt-12 border-border" />
+</section>
+
+<style>
+  /* Fluid rather than a hard jump at the `sm` breakpoint. Fraunces carries an
+     optical-size axis, so let the browser use it at display sizes. */
+  .hero-title {
+    font-size: clamp(2rem, 1.25rem + 2.8vw, 3rem);
+    line-height: 1.12;
+    letter-spacing: -0.022em;
+    font-weight: 600;
+    font-optical-sizing: auto;
+    text-wrap: balance;
+    max-width: 16ch;
+  }
+</style>

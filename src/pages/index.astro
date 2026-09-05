@@ -1,12 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Container from '../components/Container.astro';
+import Hero from '../components/Hero.astro';
 import Section from '../components/Section.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import PostCard from '../components/PostCard.astro';
 import ResearchEntry from '../components/ResearchEntry.astro';
 import { site } from '../lib/site';
-import { url } from '../lib/url';
 import { getFeaturedProjects, getResearch, getPosts } from '../lib/content';
 
 const featured = await getFeaturedProjects();
@@ -16,20 +16,7 @@ const posts = (await getPosts()).slice(0, 3);
 
 <BaseLayout title={site.title} description={site.description}>
   <Container class="py-16 sm:py-24">
-    <section aria-labelledby="hero-heading">
-      <h1 id="hero-heading" class="text-4xl leading-[1.15] sm:text-5xl">{site.name}</h1>
-      <p class="mt-6 max-w-[60ch] text-lg leading-relaxed text-muted sm:text-xl">
-        {site.tagline}
-      </p>
-      <p class="mt-8">
-        <a
-          href={url('/about')}
-          class="text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
-        >
-          More about me
-        </a>
-      </p>
-    </section>
+    <Hero />
 
     {
       featured.length > 0 && (
