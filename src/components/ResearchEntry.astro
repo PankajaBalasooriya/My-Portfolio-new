@@ -1,0 +1,60 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getEntry } from 'astro:content';
+import { url } from '../lib/url';
+
+interface Props {
+  entry: CollectionEntry<'research'>;
+  /** Homepage shows a trimmed version without the abstract. */
+  compact?: boolean;
+}
+
+const { entry, compact = false } = Astro.props as Props;
+const { title, authors, venue, year, type, doi, pdf, code, abstract, project } = entry.data;
+
+const linkedProject = project ? await getEntry(project) : undefined;
+
+const links = [
+  doi ? { label: 'DOI', href: `https://doi.org/${doi}` } : null,
+  pdf ? { label: 'PDF', href: url(pdf) } : null,
+  code ? { label: 'Code', href: code } : null,
+  linkedProject ? { label: 'Case study', href: url(`/projects/${linkedProject.id}`) } : null,
+].filter((link): link is { label: string; href: string } => link !== null);
+
+/** Emphasise the site owner in the author list. */
+const OWNER = 'Placeholder A. Author';
+---
+
+<article class="border-b border-border py-6 first:pt-0 last:border-b-0">
+  <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+    <h3 class="text-base font-medium">{title}</h3>
+    <span
+      class="rounded-full border border-border px-2 py-0.5 text-xs uppercase tracking-wide text-faint"
+      >{type}</span
+    >
+  </div>
+
+  {/* Rendered on one line: a newline here becomes a space before the comma. */}
+  <p class="mt-2 text-sm text-muted">{authors.map((author, i) => (<>{i > 0 ? ', ' : ''}<span class={author === OWNER ? 'font-medium text-text' : undefined}>{author}</span></>))}</p>
+
+  <p class="mt-1 text-sm text-faint"><cite class="not-italic">{venue}</cite>, {year}</p>
+
+  {!compact && abstract && <p class="mt-3 max-w-[68ch] text-sm text-muted">{abstract}</p>}
+
+  {
+    links.length > 0 && (
+      <ul class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+        {links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</article>

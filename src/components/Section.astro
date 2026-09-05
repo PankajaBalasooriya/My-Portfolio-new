@@ -1,0 +1,30 @@
+---
+interface Props {
+  title: string;
+  /** Optional "see everything" link, site-root-relative. */
+  href?: string;
+  linkLabel?: string;
+  class?: string;
+}
+
+import { url } from '../lib/url';
+const { title, href, linkLabel = 'View all', class: className = '' } = Astro.props as Props;
+const headingId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+---
+
+<section aria-labelledby={headingId} class={className}>
+  <div class="mb-6 flex items-baseline justify-between gap-4 border-b border-border pb-2">
+    <h2 id={headingId} class="text-xl">{title}</h2>
+    {
+      href && (
+        <a
+          href={url(href)}
+          class="shrink-0 text-sm text-muted transition-colors hover:text-accent"
+        >
+          {linkLabel} <span aria-hidden="true">→</span>
+        </a>
+      )
+    }
+  </div>
+  <slot />
+</section>

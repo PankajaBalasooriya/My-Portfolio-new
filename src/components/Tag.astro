@@ -1,0 +1,25 @@
+---
+import { url } from '../lib/url';
+
+interface Props {
+  /** Renders as a link when given a site-root-relative path. */
+  href?: string;
+  class?: string;
+}
+
+const { href, class: className = '' } = Astro.props as Props;
+const base =
+  'inline-block rounded-full border border-border px-2.5 py-0.5 text-xs text-muted';
+---
+
+{
+  href ? (
+    <a href={url(href)} class={`${base} transition-colors hover:border-accent hover:text-accent ${className}`}>
+      <slot />
+    </a>
+  ) : (
+    <span class={`${base} ${className}`}>
+      <slot />
+    </span>
+  )
+}

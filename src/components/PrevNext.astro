@@ -1,0 +1,46 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { url } from '../lib/url';
+
+interface Props {
+  /** Published later than the current post. */
+  newer?: CollectionEntry<'blog'>;
+  /** Published earlier than the current post. */
+  older?: CollectionEntry<'blog'>;
+}
+
+const { newer, older } = Astro.props as Props;
+---
+
+{
+  (newer || older) && (
+    <nav aria-label="More posts" class="mt-16 border-t border-border pt-8">
+      <ul class="flex flex-col gap-6 sm:flex-row sm:justify-between">
+        {newer && (
+          <li class="sm:max-w-[48%]">
+            <a href={url(`/blog/${newer.id}`)} class="group block">
+              <span class="text-sm text-faint">
+                <span aria-hidden="true">←</span> Newer
+              </span>
+              <span class="mt-1 block transition-colors group-hover:text-accent">
+                {newer.data.title}
+              </span>
+            </a>
+          </li>
+        )}
+        {older && (
+          <li class="sm:ml-auto sm:max-w-[48%] sm:text-right">
+            <a href={url(`/blog/${older.id}`)} class="group block">
+              <span class="text-sm text-faint">
+                Older <span aria-hidden="true">→</span>
+              </span>
+              <span class="mt-1 block transition-colors group-hover:text-accent">
+                {older.data.title}
+              </span>
+            </a>
+          </li>
+        )}
+      </ul>
+    </nav>
+  )
+}
