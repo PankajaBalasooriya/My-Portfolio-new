@@ -1,5 +1,7 @@
 ---
-import { site } from '../lib/site';
+import { getImage } from 'astro:assets';
+import { site, verifiedProfiles } from '../lib/site';
+import portraitSrc from '../assets/portrait.png';
 import { url, absoluteUrl, absoluteFromPathname } from '../lib/url';
 import fraunces from '../assets/fonts/fraunces-latin-opsz.woff2?url';
 import inter from '../assets/fonts/inter-latin-wght.woff2?url';
@@ -30,6 +32,14 @@ const canonical = absoluteFromPathname(Astro.url.pathname, Astro.site);
 const ogImage = absoluteUrl(image, Astro.site);
 const fullTitle = title === site.title ? title : `${title} · ${site.title}`;
 
+// A real photograph is a better Person image than the generic OG card.
+const portrait = await getImage({ src: portraitSrc, width: 600, format: 'jpeg' });
+
+/**
+ * schema.org Person. `sameAs` carries only profiles confirmed to belong to
+ * this person — see `verifiedProfiles` in lib/site.ts. The university is listed
+ * under `affiliation` rather than `alumniOf`, which would imply graduation.
+ */
 const personSchema = {
   '@context': 'https://schema.org',
   '@type': 'Person',
@@ -37,6 +47,22 @@ const personSchema = {
   url: absoluteUrl('/', Astro.site),
   email: site.author.email,
   description: site.description,
+  jobTitle: site.jobTitle,
+  image: absoluteFromPathname(portrait.src, Astro.site),
+  affiliation: [
+    {
+      '@type': 'CollegeOrUniversity',
+      name: site.organizations.university.name,
+      url: site.organizations.university.url,
+    },
+    {
+      '@type': 'Organization',
+      name: site.organizations.lab.name,
+      url: site.organizations.lab.url,
+    },
+  ],
+  knowsAbout: [...site.knowsAbout],
+  ...(verifiedProfiles.length > 0 ? { sameAs: verifiedProfiles } : {}),
 };
 ---
 

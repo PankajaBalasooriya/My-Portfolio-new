@@ -25,6 +25,25 @@ export const site = {
     study: 'Final-year Electronic & Telecommunication Engineering, University of Moratuwa',
     affiliation: 'Research intern, Exertion Games Lab',
   },
+  /** Used for schema.org jobTitle. */
+  jobTitle: 'Research Intern',
+  /**
+   * Verified against the live sites: mrt.ac.lk and exertiongameslab.org both
+   * resolve and their titles match. uom.lk does not resolve — do not use it.
+   */
+  organizations: {
+    university: { name: 'University of Moratuwa', url: 'https://www.mrt.ac.lk' },
+    lab: { name: 'Exertion Games Lab', url: 'https://exertiongameslab.org' },
+  },
+  /** schema.org knowsAbout — broad research and engineering areas. */
+  knowsAbout: [
+    'Robotics',
+    'Embedded systems',
+    'PCB design',
+    'Machine learning',
+    'Multi-agent reinforcement learning',
+    'Human-computer interaction',
+  ],
   locale: 'en',
   ogLocale: 'en_US',
   author: {
@@ -41,10 +60,20 @@ export const nav = [
   { label: 'CV', href: '/cv' },
 ] as const;
 
-/** Placeholder handles — replace at content time. */
+/**
+ * `verified: true` means the URL has been confirmed to resolve to this person.
+ * Only verified profiles are published as schema.org `sameAs`, because a wrong
+ * sameAs asserts an identity link that is not true. Flip the flag once the
+ * real profile URL is in place.
+ */
 export const socials = [
-  { label: 'GitHub', href: 'https://github.com/pankajabalasooriya' },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/pankajabalasooriya' },
-  { label: 'Scholar', href: 'https://scholar.google.com/' },
-  { label: 'Email', href: `mailto:${site.author.email}` },
+  { label: 'GitHub', href: 'https://github.com/PankajaBalasooriya', verified: true },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/pankajabalasooriya', verified: false },
+  { label: 'Scholar', href: 'https://scholar.google.com/', verified: false },
+  { label: 'Email', href: `mailto:${site.author.email}`, verified: true },
 ] as const;
+
+/** Profiles safe to publish as schema.org `sameAs`. */
+export const verifiedProfiles = socials
+  .filter((s) => s.verified && s.href.startsWith('https://'))
+  .map((s) => s.href);
