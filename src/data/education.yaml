@@ -1,34 +1,37 @@
-# PLACEHOLDER DATA — replace wholesale when real content lands.
-- id: lorem-university-beng
-  institution: University of Lorem Ipsum
-  credential: BSc Engineering (Hons) in Placeholder Engineering
+- id: uom-beng-entc
+  institution: University of Moratuwa
+  credential: BSc Eng (Hons) in Electronic & Telecommunication Engineering
   kind: university
   order: 1
-  location: Lorem, Ipsum
-  start: 2022-02
-  end: 2026-06
+  location: Moratuwa, Sri Lanka
+  start: 2023-02
+  logo: university-of-moratuwa.webp
   details:
-    - 'CGPA: 0.00/4.00 (up to semester 7)'
-    - 'Key courses: Nemo Enim Ipsam, Voluptatem Quia, Voluptas Sit Aspernatur'
-    - "Dean's List: semesters 2, 4, 5"
+    - 'CGPA: 3.73 / 4.00'
+    - 'Key courses: Robotics, Computer Vision, Electronic Control Systems Design, Circuits and Systems Design, Linear Algebra, Signals and Systems'
 
-- id: lorem-university-minor
-  institution: Department of Placeholders, University of Lorem Ipsum
-  credential: Minor in Placeholder Studies
+- id: esoft-diplomas
+  institution: ESOFT Metro Campus
+  credential: Pearson Assured Diplomas in Software Engineering and Information Technology
   kind: university
   order: 2
-  location: Lorem, Ipsum
-  start: 2023-02
+  location: Gampaha, Sri Lanka
+  start: 2018-12
+  end: 2019-10
+  logo: esoft-metro-campus.webp
   details:
-    - 'CGPA: 0.00/4.00 (up to semester 7)'
-    - 'Key courses: Neque Porro, Quisquam Est, Dolorem Ipsum'
+    - 'Diploma in Software Engineering (Dec 2018 – Oct 2019): OOP, databases, software engineering principles'
+    - 'Diploma in Information Technology (Dec 2018 – Aug 2019): batch top grade honours'
 
-- id: dolor-college-secondary
-  institution: Dolor Sit Amet College
-  credential: Placeholder Secondary Certificate
+- id: bandaranayake-college
+  institution: Bandaranayake College
+  credential: G.C.E. Advanced & Ordinary Level
   kind: school
-  location: Dolor, Amet
-  start: 2012-01
-  end: 2020-10
+  order: 1
+  location: Gampaha, Sri Lanka
+  start: 2014-05
+  end: 2022-09
+  logo: bandaranayake-college.webp
   details:
-    - At vero eos et accusamus et iusto odio dignissimos ducimus.
+    - 'Advanced Level, Physical Sciences (May 2019 – Sep 2022): Z-score 2.5230 — Combined Mathematics, Physics, Chemistry'
+    - 'Ordinary Level (May 2014 – Dec 2018): 9 A grades — Mathematics, Science, English Literature, Business Studies, ICT'

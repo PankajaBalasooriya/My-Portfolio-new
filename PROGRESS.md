@@ -21,9 +21,10 @@ the copy and data are still placeholders.
 | All routes | Done |
 | Deploy pipeline + custom domain | Done |
 | Quality gates (types, contrast, Lighthouse) | Done |
+| Experience + education data | Done — from the CV |
+| Institution logos | Done |
 | **Real copy** | **Not started** |
-| **Real content entries** | **Not started** |
-| **Institution logos** | **Awaiting files** |
+| **Research, awards, volunteering, stack data** | **Still placeholder** |
 
 Lighthouse on the live domain: **100 / 100 / 100 / 100 / 100** (median of 3,
 mobile emulation).
@@ -120,7 +121,10 @@ would squash internships against a decade of schooling.
 
 **Logos sit on a light chip** so a single normal-colour file works in both
 themes. `logoDark` exists as a per-entry override. Missing logos fall back to a
-monogram rather than a gap.
+monogram rather than a gap. The current files came from Wikipedia/Wikimedia —
+Monash, Moratuwa and Bandaranayake are the institutions' arms or crests rather
+than their modern wordmarks, and two were non-free Wikipedia uploads. Replacing
+them with official artwork from each brand portal would be cleaner.
 
 **`sameAs` carries only verified profiles.** A wrong `sameAs` asserts an
 identity link that isn't true. GitHub, Scholar and ORCID were machine-checked;
@@ -178,29 +182,35 @@ through `url()` in [src/lib/url.ts](src/lib/url.ts).
    highest-value sentence on the site for the people most likely to act on it.
 3. **The `/about` biography** — three Lorem paragraphs currently carrying the
    whole page.
-4. **Replace every placeholder entry** in `src/content/` and `src/data/`. They
-   are marked `PLACEHOLDER`.
-5. **`src/data/stack.yaml`** is guesswork seeded from the project files. The
-   real list should include 4-layer PCB design, computer vision, 3D enclosure
-   modelling, and the drone/IoT work.
+### Still placeholder
+
+Experience and education are filled in from the CV. These are not.
+
+4. **`research.yaml`** — the CV lists three real publications (VibeCoP, under
+   review at ACM UIST 2026; Listen to the Plant, conditionally accepted at ACM
+   DIS 2026; SymbioSip, accepted at ACM DIS 2026 Interactivity).
+5. **`awards.yaml`** — the CV lists seven, including 1st Runner Up at the Sri
+   Lanka Robotics Challenge and 1st Runner Up at Robofest 2025 Open Category.
+6. **`volunteering.yaml`** — IEEE Student Branch and Electronic Club roles.
+7. **`projects/`** — two Lorem entries; the CV describes eleven real ones.
+8. **`stack.yaml`** — still guesswork. The CV's skills summary is the real
+    list: STM32Cube, PlatformIO, FreeRTOS, ESP-IDF, Altium, SolidWorks, ROS 2
+    Humble, Gazebo, Webots, RViz, ArduPilot, TensorFlow, PyTorch, OpenCV, YOLO,
+    scikit-learn, Edge Impulse, React, Flask, Node-RED, MQTT.
 
 ### Assets
 
-6. **Institution logos** → `public/logos/`, then reference by filename from the
-   YAML. Use official artwork from each institution's brand or press page; see
-   the README in that folder. This is the biggest visual improvement left on
-   `/about`.
-7. **`public/og-default.png`** is still the generated placeholder card, so link
-   previews on LinkedIn, X and Slack show a stand-in rather than anything real.
+9. **`public/og-default.png`** is still the generated placeholder card, so link
+    previews on LinkedIn, X and Slack show a stand-in rather than anything real.
 
 ### Optional
 
-8. `site.location` is deliberately empty — set it and the About page picks it up.
-9. `~9 MB` of source PNGs in the repo (`portrait.png`, `portrait-landscape.png`).
+10. `site.location` is deliberately empty — set it and the About page picks it up.
+11. `~9 MB` of source PNGs in the repo (`portrait.png`, `portrait-landscape.png`).
    Harmless, and it preserves quality for re-crops; JPEG would cut it to well
    under a megabyte.
-10. The `/projects` filter state isn't in the URL, so a filtered view isn't
+12. The `/projects` filter state isn't in the URL, so a filtered view isn't
     shareable — the deliberate price of zero JavaScript.
-11. Contact block profile links repeat the footer's, roughly 40px apart.
-12. Lighthouse in CI is advisory only (`continue-on-error`), because scores
+13. Contact block profile links repeat the footer's, roughly 40px apart.
+14. Lighthouse in CI is advisory only (`continue-on-error`), because scores
     against a live URL vary on shared runners.
