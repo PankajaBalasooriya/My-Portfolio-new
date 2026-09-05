@@ -1,0 +1,115 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render, type CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import Prose from '../../components/Prose.astro';
+import Tag from '../../components/Tag.astro';
+import { url } from '../../lib/url';
+import { getProjects } from '../../lib/content';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const projects = await getProjects();
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+};
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props as Props;
+const { title, summary, role, period, tags, stack, repo, demo, cover, coverAlt } = project.data;
+const { Content } = await render(project);
+
+const links = [
+  repo ? { label: 'Repository', href: repo } : null,
+  demo ? { label: 'Demo', href: demo } : null,
+].filter((link): link is { label: string; href: string } => link !== null);
+---
+
+<BaseLayout title={title} description={summary} type="article">
+  <Container class="py-14 sm:py-20">
+    <article>
+      <header class="mb-10">
+        <p class="mb-4">
+          <a href={url('/projects')} class="text-sm text-muted transition-colors hover:text-accent">
+            <span aria-hidden="true">←</span> All projects
+          </a>
+        </p>
+
+        <h1 class="text-3xl sm:text-4xl">{title}</h1>
+        <p class="mt-4 max-w-[60ch] text-lg text-muted">{summary}</p>
+
+        <dl class="mt-8 grid gap-x-8 gap-y-4 border-y border-border py-6 text-sm sm:grid-cols-2">
+          <div>
+            <dt class="text-faint">Role</dt>
+            <dd class="mt-0.5">{role}</dd>
+          </div>
+          <div>
+            <dt class="text-faint">Period</dt>
+            <dd class="mt-0.5">{period}</dd>
+          </div>
+          {
+            stack.length > 0 && (
+              <div class="sm:col-span-2">
+                <dt class="text-faint">Stack</dt>
+                <dd class="mt-0.5">{stack.join(' · ')}</dd>
+              </div>
+            )
+          }
+          {
+            links.length > 0 && (
+              <div class="sm:col-span-2">
+                <dt class="text-faint">Links</dt>
+                <dd class="mt-0.5 flex flex-wrap gap-x-4">
+                  {links.map((link) => (
+                    <a
+                      href={link.href}
+                      rel="noopener"
+                      class="text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
+                    >
+                      {link.label}
+                    </a>
+                  ))}
+                </dd>
+              </div>
+            )
+          }
+        </dl>
+
+        {
+          tags.length > 0 && (
+            <ul class="mt-6 flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <li>
+                  <Tag>{tag}</Tag>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+
+        {
+          cover && (
+            <Image
+              src={cover}
+              alt={coverAlt ?? ''}
+              widths={[640, 1280]}
+              sizes="(min-width: 768px) 48rem, 100vw"
+              class="mt-8 aspect-[16/9] w-full rounded-lg border border-border object-cover"
+              loading="eager"
+            />
+          )
+        }
+      </header>
+
+      <Prose>
+        <Content />
+      </Prose>
+    </article>
+  </Container>
+</BaseLayout>

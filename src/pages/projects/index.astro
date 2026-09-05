@@ -1,0 +1,68 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getProjects, getProjectTags } from '../../lib/content';
+
+const projects = await getProjects();
+const tags = await getProjectTags();
+
+/** Ids must be CSS-selector safe; tags are authored kebab-case but don't trust that. */
+const tagId = (tag: string) => `pt-${tag.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
+
+/**
+ * Zero-JS filtering: one radio per tag, and a generated rule per tag that hides
+ * non-matching cards. Radios keep it keyboard-navigable for free.
+ */
+const filterCss = tags
+  .map(
+    (tag) => `#project-filter:has(#${tagId(tag)}:checked) ~ #project-grid > li:not([data-tags~="${tag}"]) { display: none; }`,
+  )
+  .join('\n');
+---
+
+<PageLayout
+  title="Projects"
+  description="Hardware, embedded, and machine learning projects."
+  lede="Things I have designed, built, and shipped. Filter by tag."
+>
+  <div
+    id="project-filter"
+    role="group"
+    aria-label="Filter projects by tag"
+    class="mb-8 flex flex-wrap gap-2"
+  >
+    <input class="peer/all sr-only" type="radio" name="project-tag" id="pt-all" checked />
+    <label
+      for="pt-all"
+      class="cursor-pointer rounded-full border border-border px-3 py-1 text-sm text-muted transition-colors hover:border-accent hover:text-accent peer-checked/all:border-accent peer-checked/all:text-accent peer-focus-visible/all:outline peer-focus-visible/all:outline-2 peer-focus-visible/all:outline-offset-2 peer-focus-visible/all:outline-accent"
+    >
+      All <span class="text-faint">{projects.length}</span>
+    </label>
+
+    {
+      tags.map((tag) => (
+        <>
+          <input class="peer sr-only" type="radio" name="project-tag" id={tagId(tag)} />
+          <label
+            for={tagId(tag)}
+            class="cursor-pointer rounded-full border border-border px-3 py-1 text-sm text-muted transition-colors hover:border-accent hover:text-accent peer-checked:border-accent peer-checked:text-accent peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent"
+          >
+            {tag}
+          </label>
+        </>
+      ))
+    }
+  </div>
+
+  <ul id="project-grid" class="grid gap-6 sm:grid-cols-2">
+    {
+      projects.map((project) => (
+        <li class="flex" data-tags={project.data.tags.join(' ')}>
+          <ProjectCard project={project} />
+        </li>
+      ))
+    }
+  </ul>
+
+  <style is:inline set:html={filterCss} />
+</PageLayout>
