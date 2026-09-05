@@ -5,7 +5,8 @@
  *   pnpm lighthouse --url <url>          # audits a deployed URL instead
  *   pnpm lighthouse --path /blog         # a different route on the preview
  *   pnpm lighthouse --min 90             # lower the bar (default 95)
- *   pnpm lighthouse --verbose            # also list every failing audit
+ *   pnpm lighthouse --verbose            # list audits scoring below 100
+ *   pnpm lighthouse --runs 3             # median of 3 runs (noisy networks)
  *
  * Assumes `pnpm build` has already run when auditing the local preview.
  */
@@ -18,6 +19,7 @@ const PATH_ = argValue('--path') ?? '/';
 const EXPLICIT_URL = argValue('--url');
 const PORT = Number(argValue('--port') ?? 4325);
 const VERBOSE = process.argv.includes('--verbose');
+const RUNS = Math.max(1, Number(argValue('--runs') ?? 1));
 
 function argValue(flag) {
   const i = process.argv.indexOf(flag);
@@ -72,22 +74,41 @@ async function main() {
   });
 
   try {
-    const result = await lighthouse(target, {
-      port: chrome.port,
-      output: 'json',
-      logLevel: 'error',
-      // Mobile emulation with throttling — the default, and the harsher bar.
-      formFactor: 'mobile',
-      screenEmulation: { mobile: true, width: 412, height: 823, deviceScaleFactor: 1.75 },
-    });
+    // Lighthouse scores vary run to run, especially against a remote URL over
+    // a real network. Take the median of N runs, as Lighthouse itself advises.
+    const runs = [];
+    for (let i = 0; i < RUNS; i++) {
+      const result = await lighthouse(target, {
+        port: chrome.port,
+        output: 'json',
+        logLevel: 'error',
+        // Mobile emulation with throttling — the default, and the harsher bar.
+        formFactor: 'mobile',
+        screenEmulation: { mobile: true, width: 412, height: 823, deviceScaleFactor: 1.75 },
+      });
+      if (!result?.lhr) throw new Error('Lighthouse returned no result');
+      runs.push(result.lhr);
+      if (RUNS > 1) {
+        const line = Object.values(result.lhr.categories)
+          .map((c) => `${c.title.split(' ')[0]} ${Math.round((c.score ?? 0) * 100)}`)
+          .join('  ');
+        console.log(`  run ${i + 1}/${RUNS}: ${line}`);
+      }
+    }
+    if (RUNS > 1) console.log();
 
-    if (!result?.lhr) throw new Error('Lighthouse returned no result');
+    const median = (values) => {
+      const sorted = [...values].sort((a, b) => a - b);
+      const mid = sorted.length >> 1;
+      return sorted.length % 2 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
+    };
 
-    const categories = Object.values(result.lhr.categories);
+    const result = { lhr: runs[0] };
+    const categories = Object.values(runs[0].categories);
     let failed = 0;
 
     for (const c of categories) {
-      const score = Math.round((c.score ?? 0) * 100);
+      const score = median(runs.map((lhr) => Math.round((lhr.categories[c.id].score ?? 0) * 100)));
       const ok = score >= MIN;
       if (!ok) failed++;
       console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${c.title.padEnd(18)} ${String(score).padStart(3)}`);
@@ -99,7 +120,9 @@ async function main() {
           .map((ref) => ({ ref, audit: result.lhr.audits[ref.id] }))
           .filter(({ audit }) => audit && audit.score !== null && audit.score < 1);
         if (!failing.length) continue;
-        console.log(`\n  ${c.title} — failing audits:`);
+        // A category can still score 100 while individual audits score below
+        // it — the category score is weighted and rounded.
+        console.log(`\n  ${c.title} — audits scoring below 100:`);
         for (const { ref, audit } of failing) {
           console.log(`    - ${audit.id} (weight ${ref.weight}): ${audit.title}`);
           for (const item of (audit.details?.items ?? []).slice(0, 3)) {
