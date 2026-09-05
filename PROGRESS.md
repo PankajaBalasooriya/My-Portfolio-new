@@ -21,10 +21,10 @@ the copy and data are still placeholders.
 | All routes | Done |
 | Deploy pipeline + custom domain | Done |
 | Quality gates (types, contrast, Lighthouse) | Done |
-| Experience + education data | Done — from the CV |
+| All CV-derived data | Done — experience, education, research, awards, volunteering, certificates, stack |
 | Institution logos | Done |
-| **Real copy** | **Not started** |
-| **Research, awards, volunteering, stack data** | **Still placeholder** |
+| **Real copy** (hero, biography) | **Not started** |
+| **Projects and blog** | **Still placeholder** |
 
 Lighthouse on the live domain: **100 / 100 / 100 / 100 / 100** (median of 3,
 mobile emulation).
@@ -86,11 +86,11 @@ the real palette after a retheme rather than a copy that can drift.
 
 ## Content model
 
-Eight collections in [src/content.config.ts](src/content.config.ts), all Zod-validated.
+Nine collections in [src/content.config.ts](src/content.config.ts), all Zod-validated.
 
 **Prose (MDX)** — `blog`, `projects` in `src/content/`.
 **Data (YAML)** — `experience`, `education`, `stack`, `research`, `awards`,
-`volunteering` in `src/data/`.
+`certificates`, `volunteering` in `src/data/`.
 
 CV dates are month-precision **strings** (`"2025-01"`), not `Date`. A real
 `Date` would invent a day and drag timezone drift onto the print CV; `YYYY-MM`
@@ -129,6 +129,11 @@ them with official artwork from each brand portal would be cleaner.
 **`sameAs` carries only verified profiles.** A wrong `sameAs` asserts an
 identity link that isn't true. GitHub, Scholar and ORCID were machine-checked;
 LinkedIn blocks bots and is marked verified on the owner's word.
+
+**Publication status is data, not prose.** `research.status` distinguishes
+published / accepted / conditionally-accepted / under-review, drives the sort
+(settled work first) and controls the badge: only settled results get the
+accent, so a submission never reads as confidently as an accepted paper.
 
 **Theme is three-state** — system / light / dark. With only two, choosing either
 left no way back to following the device.
@@ -200,17 +205,17 @@ Experience and education are filled in from the CV. These are not.
 
 ### Assets
 
-9. **`public/og-default.png`** is still the generated placeholder card, so link
+6. **`public/og-default.png`** is still the generated placeholder card, so link
     previews on LinkedIn, X and Slack show a stand-in rather than anything real.
 
 ### Optional
 
-10. `site.location` is deliberately empty — set it and the About page picks it up.
-11. `~9 MB` of source PNGs in the repo (`portrait.png`, `portrait-landscape.png`).
+7. `site.location` is deliberately empty — set it and the About page picks it up.
+8. `~9 MB` of source PNGs in the repo (`portrait.png`, `portrait-landscape.png`).
    Harmless, and it preserves quality for re-crops; JPEG would cut it to well
    under a megabyte.
-12. The `/projects` filter state isn't in the URL, so a filtered view isn't
+9. The `/projects` filter state isn't in the URL, so a filtered view isn't
     shareable — the deliberate price of zero JavaScript.
-13. Contact block profile links repeat the footer's, roughly 40px apart.
-14. Lighthouse in CI is advisory only (`continue-on-error`), because scores
+10. Contact block profile links repeat the footer's, roughly 40px apart.
+11. Lighthouse in CI is advisory only (`continue-on-error`), because scores
     against a live URL vary on shared runners.

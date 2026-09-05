@@ -23,11 +23,22 @@ export async function getFeaturedProjects(): Promise<CollectionEntry<'projects'>
   return (await getProjects()).filter((p) => p.data.featured);
 }
 
-/** Newest first, then alphabetical within a year. */
+/** Confidence of the result, most settled first. */
+const STATUS_RANK: Record<string, number> = {
+  published: 0,
+  accepted: 1,
+  'conditionally-accepted': 2,
+  'under-review': 3,
+};
+
+/** Newest year first, then settled work above submissions, then by title. */
 export async function getResearch(): Promise<CollectionEntry<'research'>[]> {
   const research = await getCollection('research');
   return research.sort(
-    (a, b) => b.data.year - a.data.year || a.data.title.localeCompare(b.data.title),
+    (a, b) =>
+      b.data.year - a.data.year ||
+      (STATUS_RANK[a.data.status] ?? 9) - (STATUS_RANK[b.data.status] ?? 9) ||
+      a.data.title.localeCompare(b.data.title),
   );
 }
 
@@ -78,6 +89,12 @@ export async function getVolunteering(): Promise<CollectionEntry<'volunteering'>
 export async function getAwards(): Promise<CollectionEntry<'awards'>[]> {
   const awards = await getCollection('awards');
   return awards.sort((a, b) => b.data.date.localeCompare(a.data.date));
+}
+
+/** Courses and certifications, most recent first. */
+export async function getCertificates(): Promise<CollectionEntry<'certificates'>[]> {
+  const entries = await getCollection('certificates');
+  return entries.sort((a, b) => b.data.date.localeCompare(a.data.date));
 }
 
 /** Tool groups for the About page, in authored order. */

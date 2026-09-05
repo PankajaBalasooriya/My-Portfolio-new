@@ -1,0 +1,28 @@
+- id: mit-16-485
+  title: MIT 16.485 — Visual Navigation for Autonomous Vehicles
+  issuer: MIT OpenCourseWare
+  date: '2025'
+  details:
+    - SLAM, visual odometry, and perception pipelines for autonomous navigation
+    - ROS 2
+
+- id: kalman-sensor-fusion
+  title: Advanced Kalman Filtering and Sensor Fusion
+  issuer: Udemy
+  date: '2025'
+  details:
+    - State estimation, extended Kalman filter, IMU and GPS fusion
+
+- id: embedded-ml-edge
+  title: Embedded Machine Learning for Edge Computing
+  issuer: University of Moratuwa
+  date: '2025'
+  details:
+    - On-device ML model development and optimisation for microcontrollers
+
+- id: microcontroller-embedded-c
+  title: Microcontroller Embedded C Programming
+  issuer: Udemy
+  date: '2025'
+  details:
+    - Low-level programming for ARM Cortex-M and peripheral interfacing

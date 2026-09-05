@@ -8,11 +8,12 @@ import type { TimelineItem } from '../components/Timeline.astro';
 import { url } from '../lib/url';
 import { CV_PDF, CV_PDF_DOWNLOAD_NAME, hasCvPdf } from '../lib/cv';
 import { site, socials } from '../lib/site';
-import { getExperience, getEducationByKind, getStack } from '../lib/content';
+import { getExperience, getEducationByKind, getStack, getCertificates } from '../lib/content';
 
 const stack = await getStack();
 const experience = await getExperience();
 const education = await getEducationByKind();
+const certificates = await getCertificates();
 
 const workEntries: TimelineItem[] = experience.map((entry) => ({
   org: entry.data.org,
@@ -99,6 +100,33 @@ const profiles = socials.filter((s) => !s.href.startsWith('mailto:'));
             School
           </h3>
           <Timeline entries={education.school.map(toEducationEntry)} headingLevel={4} />
+        </>
+      )
+    }
+
+    {
+      certificates.length > 0 && (
+        <>
+          <h3 class="mb-5 mt-12 font-display text-sm font-semibold uppercase tracking-widest text-faint">
+            Certificates and courses
+          </h3>
+          {/* Single-date items, so a list rather than a timeline. */}
+          <ul class="space-y-4">
+            {certificates.map((entry) => (
+              <li class="border-b border-border pb-4 last:border-b-0 last:pb-0">
+                <div class="sm:flex sm:items-baseline sm:justify-between sm:gap-6">
+                  <h4 class="font-medium">{entry.data.title}</h4>
+                  <p class="mt-0.5 shrink-0 text-sm tabular-nums text-faint sm:mt-0">
+                    {entry.data.date}
+                  </p>
+                </div>
+                <p class="mt-0.5 text-sm text-muted">{entry.data.issuer}</p>
+                {entry.data.details.length > 0 && (
+                  <p class="mt-1 text-sm text-faint">{entry.data.details.join(' · ')}</p>
+                )}
+              </li>
+            ))}
+          </ul>
         </>
       )
     }

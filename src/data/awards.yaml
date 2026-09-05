@@ -1,11 +1,48 @@
-# PLACEHOLDER DATA — replace wholesale when real content lands.
-- id: lorem-design-prize
-  title: Placeholder Prize for Imaginary Design
-  issuer: Lorem Ipsum Foundation
-  date: 2025-11
-  description: Awarded for consectetur adipiscing elit, sed do eiusmod tempor.
+- id: slrc-2025
+  title: Sri Lanka Robotics Challenge
+  placement: 1st Runner Up
+  issuer: Sri Lanka Robotics Challenge
+  date: 2025-04
+  description: An STM32 and vision-based autonomous robot built to complete the given task.
 
-- id: dolor-deans-list
-  title: Placeholder Dean's List
-  issuer: University of Lorem Ipsum
-  date: 2024-03
+- id: robofest-2025-open
+  title: Robofest 2025 — Open Category
+  placement: 1st Runner Up
+  issuer: Robofest
+  date: 2025-10
+  description: Vision-based autonomous drone navigation.
+
+- id: genesiz-2025
+  title: GENESIZ'25
+  placement: 2nd Runner Up
+  issuer: KDU, Sri Lanka
+  date: 2025-08
+  description: 'Open-theme idea pitching challenge: omnidirectional robots for industry.'
+
+- id: iesl-robogames-2024
+  title: IESL Robogames 2024
+  placement: 2nd Runner Up
+  issuer: IESL
+  date: 2025-04
+  description: Autonomous navigation for Kobuki robots using OpenCV, Webots simulation, and Raspberry Pi.
+
+- id: en2533-2024
+  title: EN2533 Robot Design and Competition
+  placement: 1st Place
+  issuer: University of Moratuwa
+  date: 2024-12
+  description: A robot with autonomous navigation built to complete the given task.
+
+- id: robofest-2024
+  title: Robofest 2024
+  placement: Finalist
+  issuer: Robofest
+  date: 2024-10
+  description: A micromouse robot solving a 16 × 16 maze.
+
+- id: esoft-batch-top-2019
+  title: Batch Top Honours — Information Technology
+  placement: 1st of 200+
+  issuer: ESOFT Metro Campus
+  date: 2019-12
+  description: Awarded to the best performer out of more than 200 students.

@@ -1,30 +1,46 @@
-# PLACEHOLDER DATA — replace wholesale when real content lands.
-- id: lorem-haptic-feedback
-  title: "Lorem Ipsum: On the Haptic Affordances of Placeholder Text"
+# Author lists follow the CV exactly. "Balasooriya, P." is emphasised in the
+# rendered list — see OWNER in src/components/ResearchEntry.astro.
+- id: vibecop-uist-2026
+  title: 'VibeCoP: Enhancing the Proprioception of Center of Pressure using Vibrotactile Feedback'
   authors:
-    - Placeholder A. Author
-    - Second B. Author
-    - Third C. Author
-  venue: Proceedings of the Conference on Imaginary Systems (CHI-ish)
+    - Balasooriya, P.
+    - Pathirana, R.O.
+    - Warushavithana, N.D.
+    - Ravishan, N.
+    - Sabnis, N.
+    - Elvitigala, D.S.
+  venue: ACM UIST
   year: 2026
   type: paper
-  doi: 10.0000/lorem.2026.000001
-  code: https://github.com/example/lorem-haptics
-  project: lorem-project
-  abstract: >-
-    Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium
-    doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore
-    veritatis et quasi architecto beatae vitae dicta sunt explicabo.
+  status: under-review
 
-- id: dolor-swarm-demo
-  title: "Dolor Sit: A Demonstration of Placeholder Multi-Agent Coordination"
+- id: listen-to-the-plant-dis-2026
+  title: 'Listen to the Plant: Exploring the Design of Plant Care as an Auditory Interface to Promote Caregiving Behavior'
   authors:
-    - Placeholder A. Author
-    - Fourth D. Author
-  venue: Workshop on Fictional Robotics (WFR)
-  year: 2025
+    - Luo, H.
+    - Balasooriya, P.
+    - Pathirana, R.O.
+    - Wang, H.
+    - Elvitigala, D.S.
+    - Mueller, F.
+  venue: ACM DIS (Provocation / Work-in-Progress)
+  year: 2026
+  type: paper
+  status: conditionally-accepted
+
+- id: symbiosip-dis-2026
+  title: 'SymbioSip: Human-Plant Symbiosis through a Bidirectional Hydration System'
+  authors:
+    - Luo, H.
+    - Perera, K.
+    - Montoya, M.F.
+    - Pathirana, R.O.
+    - Balasooriya, P.
+    - Patibanda, R.
+    - Elvitigala, D.S.
+    - Toups Dugas, P.O.
+    - Mueller, F.
+  venue: ACM DIS Interactivity
+  year: 2026
   type: demo
-  pdf: /papers/dolor-swarm-demo.pdf
-  abstract: >-
-    Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis
-    suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur.
+  status: accepted

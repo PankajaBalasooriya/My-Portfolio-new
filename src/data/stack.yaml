@@ -1,26 +1,35 @@
-# PLACEHOLDER — replace with your real stack. Groups render in `order`.
-# Keep each group to roughly four to eight items; a long list reads as noise.
-- id: hardware
-  label: Hardware & EDA
+# From the skills summary in public/cv.pdf. Groups render in `order`.
+- id: languages
+  label: Languages
   order: 1
-  items: [KiCad, Altium Designer, STM32, ESP32, Signal integrity, Bring-up & debug]
+  items: [Python, C++, C, MATLAB]
 
-- id: firmware
-  label: Firmware
+- id: embedded
+  label: Embedded
   order: 2
-  items: [C, C++, FreeRTOS, Zephyr, Bare-metal drivers]
+  items: [STM32Cube, PlatformIO, FreeRTOS, ESP-IDF]
 
-- id: ml
-  label: Machine learning
+- id: hardware
+  label: Hardware & CAD
   order: 3
-  items: [Python, PyTorch, NumPy, Multi-agent RL, RLlib]
+  items: [Altium Designer, SolidWorks, LTSpice, Proteus]
 
 - id: robotics
-  label: Robotics
+  label: Robotics & simulation
   order: 4
-  items: [ROS 2, Gazebo, Control systems, SLAM]
+  items: [ROS 2 Humble, Gazebo, Webots, RViz, ArduPilot, Simulink]
 
-- id: tooling
-  label: Tooling
+- id: ml
+  label: AI & machine learning
   order: 5
-  items: [Linux, Git, Docker, LaTeX, MATLAB]
+  items: [TensorFlow, PyTorch, OpenCV, YOLO, scikit-learn, Edge Impulse]
+
+- id: web
+  label: Web & apps
+  order: 6
+  items: [React, Flask, Node-RED, REST APIs, MQTT, WebSockets]
+
+- id: platforms
+  label: Platforms & shells
+  order: 7
+  items: [Linux (Ubuntu), WSL, Bash]

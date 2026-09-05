@@ -10,7 +10,21 @@ interface Props {
 }
 
 const { entry, compact = false } = Astro.props as Props;
-const { title, authors, venue, year, type, doi, pdf, code, abstract, project } = entry.data;
+const { title, authors, venue, year, type, status, doi, pdf, code, abstract, project } =
+  entry.data;
+
+const STATUS_LABEL: Record<typeof status, string> = {
+  published: 'Published',
+  accepted: 'Accepted',
+  'conditionally-accepted': 'Conditionally accepted',
+  'under-review': 'Under review',
+};
+
+/**
+ * Only settled results get the accent. An under-review submission reading as
+ * confidently as an accepted paper would overstate it.
+ */
+const settled = status === 'published' || status === 'accepted';
 
 const linkedProject = project ? await getEntry(project) : undefined;
 
@@ -21,8 +35,8 @@ const links = [
   linkedProject ? { label: 'Case study', href: url(`/projects/${linkedProject.id}`) } : null,
 ].filter((link): link is { label: string; href: string } => link !== null);
 
-/** Emphasise the site owner in the author list. */
-const OWNER = 'Placeholder A. Author';
+/** Emphasised in the author list. Must match the form used in research.yaml. */
+const OWNER = 'Balasooriya, P.';
 ---
 
 <article class="border-b border-border py-6 first:pt-0 last:border-b-0">
@@ -31,6 +45,14 @@ const OWNER = 'Placeholder A. Author';
     <span
       class="rounded-full border border-border px-2 py-0.5 text-xs uppercase tracking-wide text-faint"
       >{type}</span
+    >
+    <span
+      class:list={[
+        'rounded-full px-2 py-0.5 text-xs',
+        settled
+          ? 'border border-accent text-accent'
+          : 'border border-dashed border-border text-faint',
+      ]}>{STATUS_LABEL[status]}</span
     >
   </div>
 

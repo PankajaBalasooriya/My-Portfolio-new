@@ -9,6 +9,7 @@ import {
   getEducation,
   getVolunteering,
   getAwards,
+  getCertificates,
   getResearchByYear,
 } from '../lib/content';
 
@@ -17,6 +18,7 @@ const education = await getEducation();
 const volunteering = await getVolunteering();
 const awards = await getAwards();
 const research = await getResearchByYear();
+const certificates = await getCertificates();
 
 /** Screen chrome is hidden in print; the CV is the whole page on paper. */
 ---
@@ -149,11 +151,38 @@ const research = await getResearchByYear();
             <li class="cv-item">
               <div class="cv-row">
                 <div>
-                  <p class="font-medium">{entry.data.title}</p>
+                  <p class="font-medium">
+                    {entry.data.title}
+                    {entry.data.placement && (
+                      <span class="text-muted"> — {entry.data.placement}</span>
+                    )}
+                  </p>
                   <p class="text-muted">{entry.data.issuer}</p>
                   {entry.data.description && <p class="text-muted">{entry.data.description}</p>}
                 </div>
                 <p class="cv-period">{formatMonth(entry.data.date)}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section aria-labelledby="cv-certificates" class="cv-section">
+      <h2 id="cv-certificates" class="cv-h2">Certificates and courses</h2>
+      <ul>
+        {
+          certificates.map((entry) => (
+            <li class="cv-item">
+              <div class="cv-row">
+                <div>
+                  <p class="font-medium">{entry.data.title}</p>
+                  <p class="text-muted">{entry.data.issuer}</p>
+                  {entry.data.details.length > 0 && (
+                    <p class="text-muted">{entry.data.details.join(' · ')}</p>
+                  )}
+                </div>
+                <p class="cv-period">{entry.data.date}</p>
               </div>
             </li>
           ))

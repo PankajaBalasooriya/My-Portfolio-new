@@ -114,6 +114,14 @@ const research = defineCollection({
     venue: z.string(),
     year: z.number().int(),
     type: z.enum(['paper', 'demo', 'poster', 'preprint']),
+    /**
+     * Where the work actually is in the review process. An under-review
+     * submission must never read as published, so this is data rather than
+     * prose folded into `venue`, and it drives the sort order.
+     */
+    status: z
+      .enum(['published', 'accepted', 'conditionally-accepted', 'under-review'])
+      .default('published'),
     doi: z.string().optional(),
     pdf: z.string().optional(),
     code: z.string().url().optional(),
@@ -142,10 +150,26 @@ const awards = defineCollection({
   loader: file('./src/data/awards.yaml'),
   schema: z.object({
     id: z.string(),
+    /** The competition or programme — the scannable part. */
     title: z.string(),
+    /** The result, kept separate from the title so it can be styled. */
+    placement: z.string().optional(),
     issuer: z.string(),
     date: monthString,
     description: z.string().optional(),
+  }),
+});
+
+/** Courses and certifications — single-date, so not part of the timelines. */
+const certificates = defineCollection({
+  loader: file('./src/data/certificates.yaml'),
+  schema: z.object({
+    id: z.string(),
+    title: z.string(),
+    issuer: z.string(),
+    date: monthString,
+    details: z.array(z.string()).default([]),
+    url: z.string().url().optional(),
   }),
 });
 
@@ -169,5 +193,6 @@ export const collections = {
   stack,
   research,
   awards,
+  certificates,
   volunteering,
 };

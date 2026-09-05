@@ -1,15 +1,17 @@
-# PLACEHOLDER DATA — replace wholesale when real content lands.
-- id: lorem-robotics-mentor
-  org: Lorem Robotics Outreach
-  role: Placeholder Mentor
-  start: 2024-02
-  description: >-
-    Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam
-    nihil molestiae consequatur.
+- id: ieee-robotics-day-2025
+  org: IEEE Student Branch, University of Moratuwa
+  role: Co-Chair — IEEE Robotics Day 2025
+  start: 2025-03
+  end: 2025-04
 
-- id: dolor-society-committee
-  org: Dolor Student Society
-  role: Placeholder Committee Member
-  start: 2023-05
-  end: 2024-05
-  description: Temporibus autem quibusdam et aut officiis debitis aut rerum.
+- id: ieee-finance-industrial-relations
+  org: IEEE Student Branch, University of Moratuwa
+  role: Finance and Industrial Relations Committee Lead
+  start: 2025-01
+  end: 2025-12
+
+- id: electronic-club-industrial-relations
+  org: Electronic Club, University of Moratuwa
+  role: Industrial Relations Committee Member
+  start: 2024-01
+  end: 2024-12
