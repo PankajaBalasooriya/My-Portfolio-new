@@ -84,9 +84,23 @@ if any category falls below 95.
 ```bash
 pnpm lighthouse --path /blog          # a different route
 pnpm lighthouse --url https://...     # a deployed URL instead of the preview
-pnpm lighthouse --verbose             # list every failing audit
+pnpm lighthouse --verbose             # list audits scoring below 100
+pnpm lighthouse --runs 3              # median of 3 runs, for noisy networks
 pnpm lighthouse --min 90              # lower the bar
 ```
+
+### Lighthouse in CI
+
+The workflow runs a third job, **Lighthouse (non-blocking)**, after a successful
+deploy. It audits the URL that was just published — median of 3 runs — and
+writes the scores to the run summary.
+
+It is `continue-on-error: true` on purpose. The deployment has already happened
+by the time it runs, and scores against a live URL vary with network conditions
+on a shared runner, so a dip must never fail the workflow or gate a release.
+Read it as a report, not a gate. To enforce a threshold, make it a pre-deploy
+job against a local `astro preview` instead — stable, but it no longer measures
+what visitors actually get.
 
 ---
 
