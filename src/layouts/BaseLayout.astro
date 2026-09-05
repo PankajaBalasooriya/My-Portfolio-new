@@ -24,6 +24,9 @@ const { bare = false, ...head } = Astro.props;
 <!doctype html>
 <html lang={site.locale}>
   <head>
+    {/* Must be the first element: browsers only sniff the first 1024 bytes,
+        and the blocking theme script below is large enough to push it out. */}
+    <meta charset="utf-8" />
     <ThemeScript />
     <BaseHead {...head} />
   </head>

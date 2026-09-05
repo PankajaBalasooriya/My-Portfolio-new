@@ -40,7 +40,8 @@ const personSchema = {
 };
 ---
 
-<meta charset="utf-8" />
+{/* charset is emitted first in BaseLayout: it must fall inside the first
+    1024 bytes of the document, and the blocking theme script precedes this. */}
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="generator" content={Astro.generator} />
 
@@ -49,9 +50,8 @@ const personSchema = {
 <link rel="canonical" href={canonical} />
 {noindex && <meta name="robots" content="noindex, nofollow" />}
 
-<!-- Theme resolution runs before the stylesheet loads; see ThemeScript.astro -->
-<meta name="theme-color" content="#fbfaf8" media="(prefers-color-scheme: light)" />
-<meta name="theme-color" content="#14141a" media="(prefers-color-scheme: dark)" />
+<!-- theme-color lives in ThemeScript.astro: it must track the resolved theme,
+     not prefers-color-scheme, or the browser chrome desyncs from the page. -->
 
 <link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} />
 <link rel="sitemap" href={url('/sitemap-index.xml')} />

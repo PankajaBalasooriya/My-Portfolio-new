@@ -1,26 +1,55 @@
 ---
+import { themeColors } from '../lib/theme';
+
 /**
- * Blocking theme resolution. MUST be rendered in <head> before any stylesheet
- * so the correct class is on <html> before first paint. This is what prevents
- * the flash of wrong theme; do not defer it, move it, or bundle it.
+ * Blocking theme resolution. MUST render in <head> before any stylesheet so
+ * the correct class is on <html> before first paint. This is what prevents the
+ * flash of wrong theme; do not defer it, move it, or bundle it.
+ *
+ * It also owns <meta name="theme-color">. Driving that off prefers-color-scheme
+ * alone would leave the browser chrome light while the page renders dark for a
+ * visitor who chose dark on a light device.
+ *
+ * Exposes window.__theme so ThemeToggle has one implementation to call rather
+ * than a second copy of this logic.
  */
+const script = `
+(function () {
+  var COLORS = ${JSON.stringify(themeColors)};
+  var mql = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function stored() {
+    try {
+      var v = localStorage.getItem('theme');
+      return v === 'light' || v === 'dark' ? v : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function apply(mode) {
+    var theme = mode === 'system' ? (mql.matches ? 'dark' : 'light') : mode;
+    var root = document.documentElement;
+    root.classList.toggle('dark', theme === 'dark');
+    root.style.colorScheme = theme;
+    root.dataset.themeMode = mode;
+    var meta = document.getElementById('theme-color');
+    if (meta) meta.setAttribute('content', COLORS[theme]);
+    return theme;
+  }
+
+  window.__theme = { apply: apply, stored: stored, media: mql };
+
+  apply(stored() || 'system');
+
+  // Follow the device only while the visitor has made no explicit choice.
+  mql.addEventListener('change', function () {
+    if (!stored()) apply('system');
+  });
+})();
+`;
 ---
 
-<script is:inline>
-  (function () {
-    try {
-      var stored = localStorage.getItem('theme');
-      var theme =
-        stored === 'light' || stored === 'dark'
-          ? stored
-          : window.matchMedia('(prefers-color-scheme: dark)').matches
-            ? 'dark'
-            : 'light';
-      var root = document.documentElement;
-      root.classList.toggle('dark', theme === 'dark');
-      root.style.colorScheme = theme;
-    } catch (e) {
-      /* private mode / storage disabled: fall through to the light default */
-    }
-  })();
-</script>
+{/* Precedes the script so the script can set it before first paint. */}
+<meta name="theme-color" id="theme-color" content={themeColors.light} />
+<script is:inline set:html={script} />
