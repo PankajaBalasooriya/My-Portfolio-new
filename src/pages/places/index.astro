@@ -1,0 +1,84 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import PlaceCard from '../../components/places/PlaceCard.astro';
+import PlaceFilters from '../../components/places/PlaceFilters.astro';
+import PlacesGlobe from '../../components/places/PlacesGlobe.astro';
+import PlacesStats from '../../components/places/PlacesStats.astro';
+import {
+  getPlaces,
+  getPlacesStats,
+  groupPlacesByYear,
+  isUpcomingPlace,
+  placePurposes,
+} from '../../lib/places';
+
+const places = await getPlaces();
+const visited = places.filter((place) => !isUpcomingPlace(place));
+const upcoming = places.filter(isUpcomingPlace);
+const groups = groupPlacesByYear(visited);
+const stats = getPlacesStats(places);
+const samplesOnly = places.length > 0 && places.every((place) => place.data.placeholder);
+---
+
+<PageLayout
+  title="Places"
+  description="Research, events, competitions, and selected journeys."
+  lede="A record of the places connected to my work, events, and selected journeys."
+  noindex={samplesOnly}
+>
+  {
+    samplesOnly && (
+      <aside class="rounded-md border border-accent px-4 py-3 text-sm text-muted" aria-label="Sample content notice">
+        <strong class="font-medium text-text">Sample content.</strong>{' '}
+        These entries exercise the layout and data model; their artwork, dates, and stories will be replaced with real material.
+      </aside>
+    )
+  }
+
+  <PlacesGlobe places={places} />
+
+  <div class="mt-12">
+    <PlacesStats {...stats} />
+  </div>
+
+  <div class="mt-12">
+    <PlaceFilters />
+  </div>
+
+  <div class="mt-10 space-y-14" data-place-groups>
+    {
+      groups.map((group) => (
+        <section aria-labelledby={`places-${group.year}`} data-place-year>
+          <div class="mb-6 flex items-baseline gap-4 border-b border-border pb-2">
+            <h2 id={`places-${group.year}`} class="text-xl">{group.year}</h2>
+            <span class="text-sm text-faint">{group.entries.length}</span>
+          </div>
+          <ul class="space-y-6">
+            {group.entries.map((place) => (
+              <li data-place-card data-purposes={placePurposes(place).join(' ')}>
+                <PlaceCard place={place} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+
+    {
+      upcoming.length > 0 && (
+        <section aria-labelledby="places-upcoming" data-place-year>
+          <div class="mb-6 border-b border-border pb-2">
+            <h2 id="places-upcoming" class="text-xl">Upcoming</h2>
+          </div>
+          <ul class="space-y-6">
+            {upcoming.map((place) => (
+              <li data-place-card data-purposes={placePurposes(place).join(' ')}>
+                <PlaceCard place={place} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+</PageLayout>

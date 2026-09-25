@@ -1,0 +1,80 @@
+---
+import { Image } from 'astro:assets';
+import type { PlaceEntry } from '../../lib/places';
+import { url } from '../../lib/url';
+
+interface Props {
+  video: NonNullable<PlaceEntry['data']['video']>;
+}
+
+const { video } = Astro.props as Props;
+const captions = video.captions
+  ? video.captions.startsWith('http')
+    ? video.captions
+    : url(video.captions)
+  : undefined;
+---
+
+<section aria-labelledby="place-video-title" class="mt-16">
+  <div class="mb-6 border-b border-border pb-2">
+    <h2 id="place-video-title" class="text-xl">Video</h2>
+  </div>
+
+  <div class="relative overflow-hidden rounded-lg border border-border" data-place-video>
+    <Image
+      src={video.poster}
+      alt=""
+      widths={[640, 960, 1280]}
+      sizes="(min-width: 768px) 48rem, 100vw"
+      class="aspect-video w-full object-cover"
+      loading="lazy"
+      data-video-poster
+    />
+    <button
+      type="button"
+      class="absolute inset-0 grid cursor-pointer place-items-center bg-black/15 transition-colors hover:bg-black/25"
+      aria-label={`Play ${video.title}`}
+      data-video-play
+    >
+      <span
+        class="grid h-14 w-14 place-items-center rounded-full border border-white/70 bg-black/55 text-xl text-white"
+        aria-hidden="true"
+      >▶</span>
+    </button>
+    <video
+      hidden
+      controls
+      playsinline
+      preload="none"
+      class="aspect-video w-full bg-black"
+      data-video-player
+      data-src={video.src}
+      aria-label={video.title}
+    >
+      {captions && <track kind="captions" src={captions} srclang="en" label="English" default />}
+    </video>
+  </div>
+  <p class="mt-3 max-w-[68ch] text-sm text-muted">{video.description}</p>
+</section>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-place-video]')) {
+    const button = root.querySelector<HTMLButtonElement>('[data-video-play]');
+    const poster = root.querySelector<HTMLElement>('[data-video-poster]');
+    const player = root.querySelector<HTMLVideoElement>('[data-video-player]');
+    if (!button || !poster || !player) continue;
+
+    button.addEventListener('click', () => {
+      const source = player.dataset.src;
+      if (!source) return;
+      player.src = source;
+      player.hidden = false;
+      poster.hidden = true;
+      button.hidden = true;
+      player.load();
+      void player.play().catch(() => {
+        // Browser policy may still require the visitor to press the native control.
+      });
+    });
+  }
+</script>

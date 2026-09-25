@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Abstract Melbourne skyline placeholder</title>
+  <desc id="desc">A geometric city skyline above a river crossed by a bridge.</desc>
+  <rect width="1600" height="900" fill="#14141a"/>
+  <circle cx="1240" cy="205" r="115" fill="#f0a58a" opacity=".9"/>
+  <g fill="#eae8e3" opacity=".82">
+    <path d="M120 570h120V400h84v170h106V290h138v280h86V360h104v210h92V220h100v350h115V330h145v240h170v90H120Z"/>
+    <path d="m865 220 35-120 35 120Z"/>
+  </g>
+  <path d="M0 670c270 72 520 22 790 50s520-45 810 30v150H0Z" fill="#f0a58a" opacity=".22"/>
+  <path d="M170 725c240-180 520-180 770 0s410 168 530 55" fill="none" stroke="#f0a58a" stroke-width="17" stroke-linecap="round"/>
+  <path d="M185 742c245-142 500-140 735 18" fill="none" stroke="#eae8e3" stroke-width="5" opacity=".74"/>
+</svg>

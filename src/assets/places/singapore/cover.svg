@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Abstract Singapore skyline placeholder</title>
+  <desc id="desc">A luminous tropical skyline and bay rendered as quiet geometric forms.</desc>
+  <rect width="1600" height="900" fill="#fbfaf8"/>
+  <circle cx="320" cy="220" r="112" fill="#f0d9cf"/>
+  <path d="M0 680c320-75 540 30 820-10s510-12 780 65v165H0Z" fill="#9a3412" opacity=".22"/>
+  <g fill="#1c1b19" opacity=".83">
+    <path d="M720 570h80V310h66v260h90V390h80v180h130V280h70v290h110v100H720Z"/>
+    <path d="M910 350h365l-60-72H970Z"/>
+    <path d="M300 625c0-130 44-230 100-230s100 100 100 230h-55c0-78-20-140-45-140s-45 62-45 140Z"/>
+    <path d="M470 625c0-175 55-310 125-310s125 135 125 310h-62c0-110-28-205-63-205s-63 95-63 205Z"/>
+  </g>
+  <path d="M205 750h1180" stroke="#fbfaf8" stroke-width="7" stroke-linecap="round" opacity=".8"/>
+</svg>

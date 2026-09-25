@@ -1,0 +1,63 @@
+---
+const filters = [
+  { value: 'all', label: 'All' },
+  { value: 'conference', label: 'Conference' },
+  { value: 'research', label: 'Research' },
+  { value: 'competition', label: 'Competition' },
+  { value: 'travel', label: 'Travel' },
+] as const;
+---
+
+<div data-place-filters hidden>
+  <div role="group" aria-label="Filter places by purpose" class="flex flex-wrap gap-2">
+    {
+      filters.map((filter, index) => (
+        <button
+          type="button"
+          data-place-filter={filter.value}
+          aria-pressed={index === 0 ? 'true' : 'false'}
+          class="cursor-pointer rounded-full border border-border px-3 py-1 text-sm text-muted transition-colors hover:border-accent hover:text-accent aria-pressed:border-accent aria-pressed:text-accent"
+        >
+          {filter.label}
+        </button>
+      ))
+    }
+  </div>
+  <p class="sr-only" aria-live="polite" data-place-filter-status></p>
+</div>
+
+<script>
+  const roots = document.querySelectorAll<HTMLElement>('[data-place-filters]');
+
+  for (const root of roots) {
+    root.hidden = false;
+    const buttons = root.querySelectorAll<HTMLButtonElement>('[data-place-filter]');
+    const status = root.querySelector<HTMLElement>('[data-place-filter-status]');
+
+    function applyFilter(purpose: string) {
+      let visible = 0;
+
+      for (const button of buttons) {
+        button.setAttribute('aria-pressed', String(button.dataset.placeFilter === purpose));
+      }
+
+      for (const card of document.querySelectorAll<HTMLElement>('[data-place-card]')) {
+        const purposes = card.dataset.purposes?.split(' ') ?? [];
+        const matches = purpose === 'all' || purposes.includes(purpose);
+        card.hidden = !matches;
+        if (matches) visible += 1;
+      }
+
+      for (const group of document.querySelectorAll<HTMLElement>('[data-place-year]')) {
+        group.hidden = !group.querySelector('[data-place-card]:not([hidden])');
+      }
+
+      if (status) status.textContent = `${visible} ${visible === 1 ? 'place' : 'places'} shown.`;
+      window.dispatchEvent(new CustomEvent('places:filter', { detail: { purpose } }));
+    }
+
+    for (const button of buttons) {
+      button.addEventListener('click', () => applyFilter(button.dataset.placeFilter ?? 'all'));
+    }
+  }
+</script>

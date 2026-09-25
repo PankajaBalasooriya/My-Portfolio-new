@@ -1,0 +1,43 @@
+---
+import { Image } from 'astro:assets';
+import type { PlaceEntry } from '../../lib/places';
+
+interface Props {
+  images: PlaceEntry['data']['gallery'];
+}
+
+const { images } = Astro.props as Props;
+---
+
+{
+  images.length > 0 && (
+    <section aria-labelledby="place-gallery-title" class="mt-16">
+      <div class="mb-6 border-b border-border pb-2">
+        <h2 id="place-gallery-title" class="text-xl">Gallery</h2>
+      </div>
+      <ul class="grid gap-6 sm:grid-cols-2">
+        {images.map((item) => (
+          <li>
+            <figure>
+              <Image
+                src={item.src}
+                alt={item.alt}
+                widths={[480, 800, 1200]}
+                sizes="(min-width: 640px) 22rem, 100vw"
+                class="aspect-[4/3] w-full rounded-lg border border-border object-cover"
+                loading="lazy"
+              />
+              {(item.caption || item.credit) && (
+                <figcaption class="mt-2 text-sm text-faint">
+                  {item.caption}
+                  {item.caption && item.credit && ' '}
+                  {item.credit && <span>Credit: {item.credit}</span>}
+                </figcaption>
+              )}
+            </figure>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

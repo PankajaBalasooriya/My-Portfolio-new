@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Abstract Singapore gardens placeholder</title>
+  <desc id="desc">Stylised tree-like structures rise above layered tropical foliage.</desc>
+  <rect width="1200" height="900" fill="#14141a"/>
+  <g fill="#f0a58a" opacity=".75">
+    <circle cx="255" cy="290" r="145"/><circle cx="600" cy="210" r="185"/><circle cx="930" cy="330" r="130"/>
+  </g>
+  <g fill="#eae8e3">
+    <path d="M230 900V275h50v625zM550 900V185h100v715zM905 900V315h50v585z"/>
+  </g>
+  <path d="M0 710c185-120 305 40 475-35s285 65 415-5 230-10 310 35v195H0Z" fill="#2f2f3a"/>
+  <path d="M0 790c220-90 365 30 540-10s380-45 660 25" fill="none" stroke="#f0a58a" stroke-width="16" opacity=".6"/>
+</svg>

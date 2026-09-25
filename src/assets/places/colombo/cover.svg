@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Abstract Colombo waterfront placeholder</title>
+  <desc id="desc">A warm sunrise above a geometric coastal skyline and ocean.</desc>
+  <rect width="1600" height="900" fill="#f3f1ec"/>
+  <circle cx="1240" cy="210" r="120" fill="#f0d9cf"/>
+  <path d="M0 600C260 540 440 670 700 610s430-30 900 80v210H0Z" fill="#9a3412" opacity=".16"/>
+  <path d="M0 690c280-60 470 65 760 5s510-35 840 45v160H0Z" fill="#9a3412" opacity=".28"/>
+  <g fill="#1c1b19" opacity=".82">
+    <path d="M160 590h105V390h70v200h80V455h92v135h84V330h112v260h95V430h75v160h95V370h130v220h150v78H160Z"/>
+    <path d="m620 330 27-95 27 95Z"/>
+  </g>
+  <path d="M170 742h1080" stroke="#fbfaf8" stroke-width="6" stroke-linecap="round" opacity=".72"/>
+</svg>

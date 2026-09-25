@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Abstract Melbourne tram placeholder</title>
+  <desc id="desc">A stylised tram moving between dark city blocks.</desc>
+  <rect width="1200" height="900" fill="#1d1d25"/>
+  <path d="M0 0h280v900H0zm920 0h280v900H920z" fill="#2f2f3a"/>
+  <path d="M230 900 520 0h160l290 900Z" fill="#f0a58a" opacity=".18"/>
+  <g fill="none" stroke="#eae8e3" stroke-width="7" opacity=".65">
+    <path d="M600 0v280M180 150h840M420 900l115-300m245 300L665 600"/>
+  </g>
+  <rect x="390" y="330" width="420" height="370" rx="36" fill="#eae8e3"/>
+  <rect x="440" y="390" width="320" height="125" rx="12" fill="#14141a"/>
+  <path d="M460 565h280" stroke="#9a3412" stroke-width="38"/>
+  <circle cx="495" cy="710" r="42" fill="#14141a"/>
+  <circle cx="705" cy="710" r="42" fill="#14141a"/>
+</svg>

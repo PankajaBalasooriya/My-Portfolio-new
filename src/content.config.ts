@@ -50,6 +50,94 @@ const projects = defineCollection({
       }),
 });
 
+const dayString = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected a calendar date in YYYY-MM-DD format');
+
+const placeVisit = z
+  .object({
+    id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Use a lowercase kebab-case id'),
+    title: z.string().min(1),
+    start: dayString,
+    end: dayString.optional(),
+    purpose: z.enum(['conference', 'research', 'competition', 'travel']),
+    status: z.enum(['visited', 'upcoming']),
+    tags: z.array(z.string()).default([]),
+  })
+  .refine((visit) => !visit.end || visit.end >= visit.start, {
+    message: 'end must be on or after start',
+    path: ['end'],
+  });
+
+const places = defineCollection({
+  loader: glob({ base: './src/content/places', pattern: '**/*.{md,mdx}' }),
+  schema: ({ image }) =>
+    z
+      .object({
+        title: z.string().min(1),
+        summary: z.string().min(1),
+        locality: z.string().min(1),
+        region: z.string().optional(),
+        country: z.string().min(1),
+        countryCode: z
+          .string()
+          .regex(/^[A-Z]{2}$/, 'Expected an ISO 3166-1 alpha-2 country code'),
+        coordinates: z.object({
+          lat: z.number().min(-90).max(90),
+          lng: z.number().min(-180).max(180),
+        }),
+        locationPrecision: z.enum(['exact', 'city', 'region']).default('city'),
+        cover: image(),
+        coverAlt: z.string().min(1),
+        visits: z.array(placeVisit).min(1),
+        gallery: z
+          .array(
+            z.object({
+              src: image(),
+              alt: z.string(),
+              caption: z.string().optional(),
+              credit: z.string().optional(),
+            }),
+          )
+          .default([]),
+        video: z
+          .object({
+            src: z.string().url(),
+            poster: image(),
+            title: z.string().min(1),
+            description: z.string().min(1),
+            captions: z.string().optional(),
+          })
+          .optional(),
+        links: z
+          .array(
+            z.object({
+              label: z.string().min(1),
+              url: z.string().url(),
+              kind: z.enum(['event', 'paper', 'project', 'demo', 'other']),
+            }),
+          )
+          .default([]),
+        featured: z.boolean().default(false),
+        draft: z.boolean().default(false),
+        /** Marks scaffolding copy so it is visibly labelled and not indexed. */
+        placeholder: z.boolean().default(false),
+      })
+      .superRefine((place, ctx) => {
+        const ids = new Set<string>();
+        place.visits.forEach((visit, index) => {
+          if (ids.has(visit.id)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Duplicate visit id: ${visit.id}`,
+              path: ['visits', index, 'id'],
+            });
+          }
+          ids.add(visit.id);
+        });
+      }),
+});
+
 /* -------------------------------------------------------------------------- */
 /* CV data collections (YAML)                                                  */
 /*                                                                            */
@@ -188,6 +276,7 @@ const volunteering = defineCollection({
 export const collections = {
   blog,
   projects,
+  places,
   experience,
   education,
   stack,

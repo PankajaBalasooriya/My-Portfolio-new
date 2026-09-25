@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Abstract Kandy lake placeholder</title>
+  <desc id="desc">A small pavilion beside layered hills and calm water.</desc>
+  <rect width="1200" height="900" fill="#f3f1ec"/>
+  <path d="m0 530 290-245 220 170 250-250 440 335v360H0Z" fill="#736d64" opacity=".45"/>
+  <path d="M0 610h1200v290H0Z" fill="#9a3412" opacity=".17"/>
+  <g fill="#1c1b19">
+    <path d="M410 585h380v170H410Z"/>
+    <path d="m365 585 235-160 235 160Z"/>
+    <path d="M575 500h50v255h-50Z"/>
+  </g>
+  <path d="M300 790h600" stroke="#fbfaf8" stroke-width="7" stroke-linecap="round" opacity=".72"/>
+</svg>

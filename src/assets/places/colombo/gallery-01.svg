@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Abstract Colombo street placeholder</title>
+  <desc id="desc">Layered shaded arcades leading toward a bright coastal horizon.</desc>
+  <rect width="1200" height="900" fill="#1c1b19"/>
+  <path d="M0 0h400v900H0zm800 0h400v900H800z" fill="#2f2f3a"/>
+  <path d="M180 900V310a420 420 0 0 1 840 0v590H860V330a260 260 0 0 0-520 0v570Z" fill="#9a3412" opacity=".72"/>
+  <path d="M460 900V520a140 140 0 0 1 280 0v380Z" fill="#fbfaf8"/>
+  <circle cx="600" cy="615" r="62" fill="#f0d9cf"/>
+</svg>

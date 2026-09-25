@@ -17,12 +17,13 @@ the copy and data are still placeholders.
 | Area | State |
 | --- | --- |
 | Design system, theming, layout | Done |
-| Content schemas (8 collections) | Done |
+| Content schemas (10 collections) | Done |
 | All routes | Done |
 | Deploy pipeline + custom domain | Done |
 | Quality gates (types, contrast, Lighthouse) | Done |
 | All CV-derived data | Done — experience, education, research, awards, volunteering, certificates, stack |
 | Institution logos | Done |
+| Places experience | Built — interactive globe, filters, typed entries, detail pages; sample content only |
 | **Real copy** (hero, biography) | **Not started** |
 | **Projects and blog** | **Still placeholder** |
 
@@ -37,16 +38,17 @@ Astro 5 static · Tailwind v4 · TypeScript strict · MDX · pnpm · Node 22.
 
 ```
 astro 5.18  @astrojs/mdx 4  @astrojs/sitemap 3  @astrojs/rss 4
-tailwindcss 4  @tailwindcss/vite 4  sharp 0.35
+tailwindcss 4  @tailwindcss/vite 4  sharp 0.35  cobe 2
 dev: typescript 5.9  @astrojs/check  lighthouse 13  chrome-launcher
 ```
 
 Astro is pinned to 5 deliberately — bare `astro` now resolves to 7.
 
-**Zero client-side JavaScript except the theme toggle.** Page transitions use
-the native CSS `@view-transition` rule rather than Astro's `ClientRouter`, and
-the `/projects` tag filter is pure CSS (`:has()` plus radio inputs). Keep it
-that way unless something genuinely needs interactivity.
+**Client-side JavaScript is limited to the theme toggle and `/places`.** Page
+transitions use the native CSS `@view-transition` rule rather than Astro's
+`ClientRouter`, and the `/projects` tag filter is pure CSS (`:has()` plus radio
+inputs). Places uses a route-scoped Cobe enhancement for the globe and filters;
+its complete content remains available without JavaScript.
 
 ---
 
@@ -74,6 +76,8 @@ the real palette after a retheme rather than a copy that can drift.
 /research            publications grouped by year
 /projects            filterable grid (CSS-only)
 /projects/[slug]     case study
+/places              progressive globe, stats, filters, chronological place list
+/places/[slug]       place story, gallery, optional click-to-load video
 /blog                post list
 /blog/[slug]         post with TOC, reading time, prev/next
 /blog/tags/[tag]     tag archive
@@ -86,9 +90,9 @@ the real palette after a retheme rather than a copy that can drift.
 
 ## Content model
 
-Nine collections in [src/content.config.ts](src/content.config.ts), all Zod-validated.
+Ten collections in [src/content.config.ts](src/content.config.ts), all Zod-validated.
 
-**Prose (MDX)** — `blog`, `projects` in `src/content/`.
+**Prose (MDX)** — `blog`, `projects`, `places` in `src/content/`.
 **Data (YAML)** — `experience`, `education`, `stack`, `research`, `awards`,
 `certificates`, `volunteering` in `src/data/`.
 
@@ -137,6 +141,12 @@ accent, so a submission never reads as confidently as an accepted paper.
 
 **Theme is three-state** — system / light / dark. With only two, choosing either
 left no way back to following the device.
+
+**Places remains progressively enhanced.** Cobe provides two-axis drag,
+momentum, wheel/pinch zoom, keyboard controls, synchronized markers, and theme
+updates, but the chronological cards and detail links remain the permanent
+navigation. Motion pauses offscreen and under reduced-motion preferences; video
+is created only after an explicit play action.
 
 ---
 
@@ -202,20 +212,23 @@ Experience and education are filled in from the CV. These are not.
     list: STM32Cube, PlatformIO, FreeRTOS, ESP-IDF, Altium, SolidWorks, ROS 2
     Humble, Gazebo, Webots, RViz, ArduPilot, TensorFlow, PyTorch, OpenCV, YOLO,
     scikit-learn, Edge Impulse, React, Flask, Node-RED, MQTT.
+9. **`places/`** — Colombo, Kandy, Melbourne and Singapore are visibly labelled,
+   noindex sample entries. Replace their dates, prose and SVG artwork with verified
+   stories and original media before removing `placeholder: true`.
 
 ### Assets
 
-6. **`public/og-default.png`** is still the generated placeholder card, so link
+10. **`public/og-default.png`** is still the generated placeholder card, so link
     previews on LinkedIn, X and Slack show a stand-in rather than anything real.
 
 ### Optional
 
-7. `site.location` is deliberately empty — set it and the About page picks it up.
-8. `~9 MB` of source PNGs in the repo (`portrait.png`, `portrait-landscape.png`).
+11. `site.location` is deliberately empty — set it and the About page picks it up.
+12. `~9 MB` of source PNGs in the repo (`portrait.png`, `portrait-landscape.png`).
    Harmless, and it preserves quality for re-crops; JPEG would cut it to well
    under a megabyte.
-9. The `/projects` filter state isn't in the URL, so a filtered view isn't
+13. The `/projects` filter state isn't in the URL, so a filtered view isn't
     shareable — the deliberate price of zero JavaScript.
-10. Contact block profile links repeat the footer's, roughly 40px apart.
-11. Lighthouse in CI is advisory only (`continue-on-error`), because scores
+14. Contact block profile links repeat the footer's, roughly 40px apart.
+15. Lighthouse in CI is advisory only (`continue-on-error`), because scores
     against a live URL vary on shared runners.

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Abstract Kandy hills placeholder</title>
+  <desc id="desc">Layered green-grey hills reflected in a still lake.</desc>
+  <rect width="1600" height="900" fill="#fbfaf8"/>
+  <circle cx="370" cy="230" r="105" fill="#f0d9cf"/>
+  <path d="m0 560 300-260 260 190 270-310 330 310 210-170 230 200v380H0Z" fill="#736d64" opacity=".42"/>
+  <path d="m0 645 350-225 245 165 305-230 320 205 205-115 175 130v325H0Z" fill="#1c1b19" opacity=".72"/>
+  <path d="M0 670c290 50 510-28 800 4s520-35 800 8v218H0Z" fill="#9a3412" opacity=".18"/>
+  <path d="M0 735c310 42 530-28 825 5s505-32 775 7" fill="none" stroke="#fbfaf8" stroke-width="7" opacity=".7"/>
+</svg>

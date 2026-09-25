@@ -1,0 +1,613 @@
+---
+import type { PlaceEntry } from '../../lib/places';
+import { isUpcomingPlace, placePurposes } from '../../lib/places';
+
+interface Props {
+  places: PlaceEntry[];
+}
+
+const { places } = Astro.props as Props;
+const globePlaces = places.map((place) => ({
+  id: place.id.replace(/[^a-zA-Z0-9_-]/g, '-'),
+  title: place.data.title,
+  lat: place.data.coordinates.lat,
+  lng: place.data.coordinates.lng,
+  upcoming: isUpcomingPlace(place),
+  purposes: placePurposes(place),
+}));
+---
+
+<section aria-labelledby="places-globe-title" class="mt-10">
+  <div class="mb-5 flex items-end justify-between gap-4">
+    <div>
+      <h2 id="places-globe-title" class="text-xl">Journey globe</h2>
+      <p class="mt-1 max-w-[58ch] text-sm text-muted">
+        Drag and release to glide. Scroll or pinch to zoom. Selecting a place below brings its marker into view.
+      </p>
+    </div>
+    <p class="hidden text-xs text-faint sm:block" aria-hidden="true">City-level markers</p>
+  </div>
+
+  <div
+    class="relative mx-auto aspect-square w-full max-w-[38rem] overflow-hidden rounded-full"
+    data-places-globe
+    data-places={JSON.stringify(globePlaces)}
+  >
+    <canvas
+      class="h-full w-full cursor-grab touch-none outline-none active:cursor-grabbing focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
+      role="application"
+      tabindex="0"
+      aria-label="Interactive journey globe. Drag and release to rotate with momentum, scroll or pinch to zoom, and use the arrow and plus or minus keys for keyboard control."
+      data-globe-canvas
+    ></canvas>
+
+    <div class="globe-controls" aria-label="Globe controls">
+      <button type="button" data-globe-zoom-out aria-label="Zoom out" title="Zoom out">−</button>
+      <button type="button" data-globe-reset aria-label="Reset globe view" title="Reset view">
+        Reset
+      </button>
+      <button type="button" data-globe-zoom-in aria-label="Zoom in" title="Zoom in">+</button>
+    </div>
+
+    <p
+      class="absolute inset-0 grid place-items-center rounded-full border border-border bg-surface px-12 text-center text-sm text-muted"
+      data-globe-fallback
+    >
+      The interactive globe is unavailable. Every place is listed below.
+    </p>
+
+    {
+      globePlaces.map((place) => (
+        <button
+          type="button"
+          class="globe-marker"
+          hidden
+          style={`position-anchor: --cobe-${place.id}; opacity: var(--cobe-visible-${place.id}, 0);`}
+          data-globe-marker={place.id}
+          aria-label={`Show ${place.title} in the places list`}
+          title={place.title}
+        >
+          <span aria-hidden="true"></span>
+        </button>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .globe-controls {
+    position: absolute;
+    bottom: 1.25rem;
+    left: 50%;
+    z-index: 2;
+    display: flex;
+    translate: -50% 0;
+    overflow: hidden;
+    border: 1px solid var(--c-border);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--c-bg) 88%, transparent);
+    box-shadow: 0 0.25rem 1rem color-mix(in srgb, var(--c-text) 10%, transparent);
+    backdrop-filter: blur(0.5rem);
+  }
+
+  .globe-controls button {
+    min-width: 2.5rem;
+    height: 2.25rem;
+    padding-inline: 0.75rem;
+    color: var(--c-muted);
+    font-size: 0.75rem;
+    line-height: 1;
+    transition: color 150ms ease, background-color 150ms ease;
+  }
+
+  .globe-controls button + button {
+    border-left: 1px solid var(--c-border);
+  }
+
+  .globe-controls button:hover,
+  .globe-controls button:focus-visible {
+    color: var(--c-accent);
+    background: var(--c-surface);
+    outline: none;
+  }
+
+  .globe-marker {
+    display: none;
+  }
+
+  @supports (position-anchor: --cobe-marker) {
+    .globe-marker {
+      position: absolute;
+      display: grid;
+      width: 1.75rem;
+      height: 1.75rem;
+      translate: -50% -50%;
+      place-items: center;
+      border-radius: 999px;
+      transition: opacity 150ms ease, scale 150ms ease;
+    }
+
+    .globe-marker > span {
+      display: block;
+      width: 0.65rem;
+      height: 0.65rem;
+      border: 2px solid var(--c-bg);
+      border-radius: 999px;
+      background: var(--c-accent);
+      box-shadow: 0 0 0 1px var(--c-accent);
+    }
+
+    .globe-marker:hover,
+    .globe-marker:focus-visible {
+      scale: 1.2;
+    }
+
+    .globe-marker[hidden] {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import createGlobe, { type COBEOptions, type Globe } from 'cobe';
+  import type { PlacePurpose } from '../../lib/places';
+
+  type GlobePlace = {
+    id: string;
+    title: string;
+    lat: number;
+    lng: number;
+    upcoming: boolean;
+    purposes: PlacePurpose[];
+  };
+
+  type FilterEvent = CustomEvent<{ purpose: PlacePurpose | 'all' }>;
+
+  const clampDpr = () => Math.min(window.devicePixelRatio || 1, 2);
+
+  function hexToRgb(value: string): [number, number, number] {
+    const hex = value.trim().replace('#', '');
+    const normalized = hex.length === 3 ? hex.split('').map((c) => c + c).join('') : hex;
+    const number = Number.parseInt(normalized, 16);
+    return [((number >> 16) & 255) / 255, ((number >> 8) & 255) / 255, (number & 255) / 255];
+  }
+
+  function shortestAngle(from: number, to: number): number {
+    return ((to - from + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+  }
+
+  function locationToAngles(lat: number, lng: number): [number, number] {
+    return [Math.PI - (lng * Math.PI) / 180 + Math.PI / 2, (lat * Math.PI) / 180];
+  }
+
+  function clamp(value: number, minimum: number, maximum: number): number {
+    return Math.min(maximum, Math.max(minimum, value));
+  }
+
+  function setupGlobe(root: HTMLElement) {
+    const canvas = root.querySelector<HTMLCanvasElement>('[data-globe-canvas]');
+    const fallback = root.querySelector<HTMLElement>('[data-globe-fallback]');
+    if (!canvas || !fallback) return;
+    const canvasElement = canvas;
+    const fallbackElement = fallback;
+
+    let places: GlobePlace[];
+    try {
+      places = JSON.parse(root.dataset.places ?? '[]') as GlobePlace[];
+    } catch {
+      return;
+    }
+
+    let filteredPlaces = places;
+    let globe: Globe | undefined;
+    const [initialPhi, initialTheta] = locationToAngles(-12, 105);
+    let phi = initialPhi;
+    let theta = initialTheta;
+    let scale = 1;
+    let targetPhi: number | undefined;
+    let targetTheta: number | undefined;
+    let dragStart: { x: number; y: number; phi: number; theta: number } | undefined;
+    let lastDragTime = 0;
+    let velocityPhi = 0;
+    let velocityTheta = 0;
+    let pinchDistance: number | undefined;
+    let isIntersecting = false;
+    let animationFrame: number | undefined;
+    let inertiaFrame: number | undefined;
+    let inertiaTime: number | undefined;
+
+    const activePointers = new Map<number, { x: number; y: number }>();
+
+    const markerButtons = new Map(
+      [...root.querySelectorAll<HTMLButtonElement>('[data-globe-marker]')].map((button) => [
+        button.dataset.globeMarker ?? '',
+        button,
+      ]),
+    );
+
+    function themeOptions(): Pick<COBEOptions, 'dark' | 'baseColor' | 'markerColor' | 'glowColor'> {
+      const styles = getComputedStyle(document.documentElement);
+      return {
+        dark: document.documentElement.classList.contains('dark') ? 1 : 0,
+        baseColor: hexToRgb(styles.getPropertyValue('--c-surface')),
+        markerColor: hexToRgb(styles.getPropertyValue('--c-accent')),
+        glowColor: hexToRgb(styles.getPropertyValue('--c-bg')),
+      };
+    }
+
+    function markerData() {
+      return filteredPlaces.map((place) => ({
+        location: [place.lat, place.lng] as [number, number],
+        size: place.upcoming ? 0.045 : 0.065,
+        id: place.id,
+      }));
+    }
+
+    function updateMarkerButtons() {
+      if (!globe) return;
+      const styles = getComputedStyle(root);
+      for (const place of places) {
+        const button = markerButtons.get(place.id);
+        if (!button) continue;
+        const visible = Number.parseFloat(styles.getPropertyValue(`--cobe-visible-${place.id}`)) || 0;
+        button.hidden = !filteredPlaces.includes(place) || visible < 0.45;
+      }
+    }
+
+    function draw() {
+      if (!globe) return;
+      globe.update({ phi, theta, scale });
+      updateMarkerButtons();
+    }
+
+    function setScale(nextScale: number) {
+      scale = clamp(nextScale, 0.72, 1.16);
+      draw();
+    }
+
+    function resetView() {
+      stopInertia();
+      phi = initialPhi;
+      theta = initialTheta;
+      scale = 1;
+      targetPhi = undefined;
+      targetTheta = undefined;
+      draw();
+    }
+
+    function distanceBetweenPointers(): number | undefined {
+      const [first, second] = [...activePointers.values()];
+      if (!first || !second) return undefined;
+      return Math.hypot(second.x - first.x, second.y - first.y);
+    }
+
+    function stopInertia() {
+      if (inertiaFrame !== undefined) cancelAnimationFrame(inertiaFrame);
+      inertiaFrame = undefined;
+      inertiaTime = undefined;
+      velocityPhi = 0;
+      velocityTheta = 0;
+    }
+
+    function animateInertia(time: number) {
+      inertiaFrame = undefined;
+      if (!globe || !isIntersecting || document.hidden || activePointers.size > 0) {
+        stopInertia();
+        return;
+      }
+
+      if (inertiaTime === undefined) {
+        inertiaTime = time;
+        inertiaFrame = requestAnimationFrame(animateInertia);
+        return;
+      }
+
+      const elapsed = Math.min((time - inertiaTime) / 1000, 0.032);
+      inertiaTime = time;
+      phi += velocityPhi * elapsed;
+
+      const nextTheta = theta + velocityTheta * elapsed;
+      theta = clamp(nextTheta, -1.45, 1.45);
+      if (theta !== nextTheta) velocityTheta = 0;
+
+      const damping = Math.exp(-4.2 * elapsed);
+      velocityPhi *= damping;
+      velocityTheta *= damping;
+      draw();
+
+      if (Math.hypot(velocityPhi, velocityTheta) < 0.012) {
+        stopInertia();
+        return;
+      }
+      inertiaFrame = requestAnimationFrame(animateInertia);
+    }
+
+    function startInertia() {
+      if (
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+        Math.hypot(velocityPhi, velocityTheta) < 0.08
+      ) {
+        stopInertia();
+        return;
+      }
+      inertiaTime = undefined;
+      if (inertiaFrame === undefined) inertiaFrame = requestAnimationFrame(animateInertia);
+    }
+
+    function animateToTarget() {
+      animationFrame = undefined;
+      if (
+        !globe ||
+        !isIntersecting ||
+        document.hidden ||
+        targetPhi === undefined ||
+        targetTheta === undefined
+      ) return;
+
+      const phiDistance = shortestAngle(phi, targetPhi);
+      const thetaDistance = targetTheta - theta;
+      phi += phiDistance * 0.08;
+      theta += thetaDistance * 0.08;
+
+      if (Math.abs(phiDistance) < 0.002 && Math.abs(thetaDistance) < 0.002) {
+        phi = targetPhi;
+        theta = targetTheta;
+        targetPhi = undefined;
+        targetTheta = undefined;
+        draw();
+        return;
+      }
+
+      draw();
+      animationFrame = requestAnimationFrame(animateToTarget);
+    }
+
+    function scheduleAnimation() {
+      if (animationFrame === undefined) animationFrame = requestAnimationFrame(animateToTarget);
+    }
+
+    function pauseAnimation() {
+      if (animationFrame !== undefined) cancelAnimationFrame(animationFrame);
+      animationFrame = undefined;
+      stopInertia();
+    }
+
+    function start() {
+      if (!isIntersecting || document.hidden) return;
+      if (globe) {
+        draw();
+        if (targetPhi !== undefined) scheduleAnimation();
+        return;
+      }
+      const size = Math.max(1, Math.round(root.clientWidth));
+      const dpr = clampDpr();
+      const theme = themeOptions();
+
+      try {
+        const contextOptions: WebGLContextAttributes = {
+          alpha: true,
+          antialias: true,
+          preserveDrawingBuffer: true,
+        };
+        const context =
+          canvasElement.getContext('webgl2', contextOptions) ??
+          canvasElement.getContext('webgl', contextOptions);
+        if (!context) throw new Error('WebGL is unavailable');
+
+        const options: COBEOptions = {
+          width: size,
+          height: size,
+          devicePixelRatio: dpr,
+          phi,
+          theta,
+          scale,
+          dark: theme.dark,
+          diffuse: 1.15,
+          mapSamples: 12000,
+          mapBrightness: 4.5,
+          baseColor: theme.baseColor,
+          markerColor: theme.markerColor,
+          glowColor: theme.glowColor,
+          markers: markerData(),
+          markerElevation: 0.025,
+          opacity: 0.92,
+          context: contextOptions,
+        };
+        globe = createGlobe(canvasElement, options);
+        fallbackElement.hidden = true;
+        draw();
+        if (targetPhi !== undefined) scheduleAnimation();
+      } catch {
+        fallbackElement.hidden = false;
+      }
+    }
+
+    function focusPlace(placeId: string) {
+      const place = places.find((item) => item.id === placeId);
+      if (!place) return;
+      stopInertia();
+      const [nextPhi, nextTheta] = locationToAngles(place.lat, place.lng);
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        phi = nextPhi;
+        theta = nextTheta;
+        targetPhi = undefined;
+        targetTheta = undefined;
+      } else {
+        targetPhi = nextPhi;
+        targetTheta = nextTheta;
+      }
+      start();
+      if (targetPhi === undefined) draw();
+      else scheduleAnimation();
+    }
+
+    canvasElement.addEventListener('pointerdown', (event) => {
+      stopInertia();
+      targetPhi = undefined;
+      targetTheta = undefined;
+      activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (activePointers.size === 1) {
+        dragStart = { x: event.clientX, y: event.clientY, phi, theta };
+        lastDragTime = performance.now();
+      } else if (activePointers.size === 2) {
+        pinchDistance = distanceBetweenPointers();
+        velocityPhi = 0;
+        velocityTheta = 0;
+      }
+      canvasElement.setPointerCapture(event.pointerId);
+    });
+
+    canvasElement.addEventListener('pointermove', (event) => {
+      const previousPointer = activePointers.get(event.pointerId);
+      if (!previousPointer) return;
+      activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+      if (activePointers.size >= 2) {
+        velocityPhi = 0;
+        velocityTheta = 0;
+        const nextDistance = distanceBetweenPointers();
+        if (nextDistance !== undefined && pinchDistance !== undefined && pinchDistance > 0) {
+          setScale(scale * (nextDistance / pinchDistance));
+        }
+        pinchDistance = nextDistance;
+        return;
+      }
+
+      if (!dragStart) return;
+      phi = dragStart.phi + (event.clientX - dragStart.x) / 180;
+      const nextTheta = dragStart.theta + (event.clientY - dragStart.y) / 180;
+      theta = clamp(nextTheta, -1.45, 1.45);
+
+      const now = performance.now();
+      const elapsed = Math.max((now - lastDragTime) / 1000, 1 / 120);
+      const nextVelocityPhi = clamp((event.clientX - previousPointer.x) / 180 / elapsed, -4, 4);
+      const nextVelocityTheta =
+        theta === nextTheta
+          ? clamp((event.clientY - previousPointer.y) / 180 / elapsed, -4, 4)
+          : 0;
+      velocityPhi = velocityPhi * 0.55 + nextVelocityPhi * 0.45;
+      velocityTheta = velocityTheta * 0.55 + nextVelocityTheta * 0.45;
+      lastDragTime = now;
+      draw();
+    });
+
+    const finishPointer = (event: PointerEvent, allowInertia: boolean) => {
+      activePointers.delete(event.pointerId);
+      pinchDistance = activePointers.size >= 2 ? distanceBetweenPointers() : undefined;
+
+      const remainingPointer = activePointers.values().next().value as
+        | { x: number; y: number }
+        | undefined;
+      dragStart = remainingPointer
+        ? { x: remainingPointer.x, y: remainingPointer.y, phi, theta }
+        : undefined;
+      const releaseTime = performance.now();
+      if (!remainingPointer && releaseTime - lastDragTime > 100) {
+        velocityPhi = 0;
+        velocityTheta = 0;
+      }
+      lastDragTime = releaseTime;
+      if (!remainingPointer && allowInertia) startInertia();
+      else if (!remainingPointer) stopInertia();
+    };
+    canvasElement.addEventListener('pointerup', (event) => finishPointer(event, true));
+    canvasElement.addEventListener('pointercancel', (event) => finishPointer(event, false));
+
+    canvasElement.addEventListener(
+      'wheel',
+      (event) => {
+        event.preventDefault();
+        stopInertia();
+        targetPhi = undefined;
+        targetTheta = undefined;
+        setScale(scale * Math.exp(-event.deltaY * 0.0015));
+      },
+      { passive: false },
+    );
+
+    canvasElement.addEventListener('keydown', (event) => {
+      const rotationStep = event.shiftKey ? 0.24 : 0.1;
+      let handled = true;
+
+      if (event.key === 'ArrowLeft') phi -= rotationStep;
+      else if (event.key === 'ArrowRight') phi += rotationStep;
+      else if (event.key === 'ArrowUp') theta = clamp(theta - rotationStep, -1.45, 1.45);
+      else if (event.key === 'ArrowDown') theta = clamp(theta + rotationStep, -1.45, 1.45);
+      else if (event.key === '+' || event.key === '=') setScale(scale + 0.08);
+      else if (event.key === '-' || event.key === '_') setScale(scale - 0.08);
+      else if (event.key === '0' || event.key === 'Home') resetView();
+      else handled = false;
+
+      if (!handled) return;
+      event.preventDefault();
+      stopInertia();
+      targetPhi = undefined;
+      targetTheta = undefined;
+      draw();
+    });
+
+    root.querySelector<HTMLButtonElement>('[data-globe-zoom-out]')?.addEventListener('click', () => {
+      setScale(scale - 0.1);
+    });
+    root.querySelector<HTMLButtonElement>('[data-globe-zoom-in]')?.addEventListener('click', () => {
+      setScale(scale + 0.1);
+    });
+    root.querySelector<HTMLButtonElement>('[data-globe-reset]')?.addEventListener('click', resetView);
+
+    for (const [placeId, button] of markerButtons) {
+      button.addEventListener('click', () => {
+        const card = document.querySelector<HTMLElement>(`[data-place-id="${CSS.escape(placeId)}"]`);
+        card?.querySelector<HTMLAnchorElement>('[data-place-link]')?.focus();
+        card?.scrollIntoView({
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+          block: 'center',
+        });
+      });
+    }
+
+    document.addEventListener('focusin', (event) => {
+      const card = (event.target as HTMLElement).closest<HTMLElement>('[data-place-id]');
+      if (card?.dataset.placeId) focusPlace(card.dataset.placeId);
+    });
+
+    window.addEventListener('places:filter', ((event: FilterEvent) => {
+      const purpose = event.detail.purpose;
+      if (purpose === 'all') filteredPlaces = places;
+      else filteredPlaces = places.filter((place) => place.purposes.includes(purpose));
+      globe?.update({ markers: markerData() });
+      updateMarkerButtons();
+    }) as EventListener);
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (!globe) return;
+      const size = Math.max(1, Math.round(root.clientWidth));
+      const dpr = clampDpr();
+      globe.update({ width: size, height: size, devicePixelRatio: dpr });
+      updateMarkerButtons();
+    });
+    resizeObserver.observe(root);
+
+    const intersectionObserver = new IntersectionObserver(
+      ([entry]) => {
+        isIntersecting = entry?.isIntersecting ?? false;
+        if (isIntersecting) start();
+        else pauseAnimation();
+      },
+      { rootMargin: '120px' },
+    );
+    intersectionObserver.observe(root);
+    const initialRect = root.getBoundingClientRect();
+    isIntersecting = initialRect.bottom >= -120 && initialRect.top <= window.innerHeight + 120;
+    if (isIntersecting) start();
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) pauseAnimation();
+      else start();
+    });
+
+    const themeObserver = new MutationObserver(() => globe?.update(themeOptions()));
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-places-globe]')) setupGlobe(root);
+</script>

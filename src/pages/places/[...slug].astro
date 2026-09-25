@@ -1,0 +1,163 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import PlaceGallery from '../../components/places/PlaceGallery.astro';
+import PlaceVideo from '../../components/places/PlaceVideo.astro';
+import Prose from '../../components/Prose.astro';
+import Tag from '../../components/Tag.astro';
+import { url } from '../../lib/url';
+import {
+  formatVisitDate,
+  getPlaces,
+  isUpcomingPlace,
+  type PlaceEntry,
+} from '../../lib/places';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const places = await getPlaces();
+  return places.map((place) => ({ params: { slug: place.id }, props: { place, places } }));
+};
+
+interface Props {
+  place: PlaceEntry;
+  places: PlaceEntry[];
+}
+
+const { place, places } = Astro.props as Props;
+const { Content } = await render(place);
+const index = places.findIndex((entry) => entry.id === place.id);
+const newer = index > 0 ? places[index - 1] : undefined;
+const older = index >= 0 && index < places.length - 1 ? places[index + 1] : undefined;
+const upcoming = isUpcomingPlace(place);
+const location = [place.data.locality, place.data.region, place.data.country]
+  .filter((part, partIndex, all) => part && all.indexOf(part) === partIndex)
+  .join(', ');
+---
+
+<BaseLayout
+  title={place.data.title}
+  description={place.data.summary}
+  noindex={place.data.placeholder || place.data.draft}
+>
+  <Container class="py-14 sm:py-20">
+    <article>
+      <header>
+        <p>
+          <a href={url('/places')} class="text-sm text-muted transition-colors hover:text-accent">
+            <span aria-hidden="true">←</span> All places
+          </a>
+        </p>
+
+        {
+          place.data.placeholder && (
+            <p class="mt-6 rounded-md border border-accent px-4 py-3 text-sm text-muted">
+              <strong class="font-medium text-text">Sample entry.</strong>{' '}
+              The structure is real; the dates, story, and illustrations are placeholders.
+            </p>
+          )
+        }
+
+        <div class="mt-8 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 class="text-3xl sm:text-4xl">{place.data.title}</h1>
+            <p class="mt-2 text-sm text-faint">{location}</p>
+          </div>
+          {upcoming && <Tag class="border-accent text-accent">Upcoming</Tag>}
+        </div>
+
+        <p class="mt-4 max-w-[60ch] text-lg text-muted">{place.data.summary}</p>
+
+        <dl class="mt-8 grid gap-x-8 gap-y-5 border-y border-border py-6 text-sm sm:grid-cols-2">
+          <div>
+            <dt class="text-faint">Location precision</dt>
+            <dd class="mt-0.5 capitalize">{place.data.locationPrecision}</dd>
+          </div>
+          <div>
+            <dt class="text-faint">Visits</dt>
+            <dd class="mt-0.5">{place.data.visits.length}</dd>
+          </div>
+          {
+            place.data.visits.map((visit) => (
+              <div class="sm:col-span-2">
+                <dt class="text-faint">{visit.title}</dt>
+                <dd class="mt-1 flex flex-wrap items-center gap-2">
+                  <time datetime={visit.start}>{formatVisitDate(visit)}</time>
+                  <Tag>{visit.purpose}</Tag>
+                  {visit.status === 'upcoming' && <span class="text-accent">Upcoming</span>}
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <Image
+          src={place.data.cover}
+          alt={place.data.coverAlt}
+          widths={[640, 960, 1280, 1600]}
+          sizes="(min-width: 768px) 48rem, 100vw"
+          class="mt-8 aspect-[16/9] w-full rounded-lg border border-border object-cover"
+          loading="eager"
+        />
+      </header>
+
+      <Prose class="mt-12">
+        <Content />
+      </Prose>
+
+      {
+        place.data.links.length > 0 && (
+          <section aria-labelledby="place-links-title" class="mt-16">
+            <div class="mb-5 border-b border-border pb-2">
+              <h2 id="place-links-title" class="text-xl">Related</h2>
+            </div>
+            <ul class="space-y-3">
+              {place.data.links.map((link) => (
+                <li>
+                  <a
+                    href={link.url}
+                    rel="noopener"
+                    class="text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
+                  >
+                    {link.label} <span aria-hidden="true">↗</span>
+                  </a>
+                  <span class="ml-2 text-xs text-faint">{link.kind}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      <PlaceGallery images={place.data.gallery} />
+      {place.data.video && <PlaceVideo video={place.data.video} />}
+    </article>
+
+    {
+      (newer || older) && (
+        <nav aria-label="More places" class="mt-16 border-t border-border pt-8">
+          <ul class="flex flex-col gap-6 sm:flex-row sm:justify-between">
+            {newer && (
+              <li class="sm:max-w-[48%]">
+                <a href={url(`/places/${newer.id}`)} class="group block">
+                  <span class="text-sm text-faint"><span aria-hidden="true">←</span> Newer</span>
+                  <span class="mt-1 block transition-colors group-hover:text-accent">{newer.data.title}</span>
+                </a>
+              </li>
+            )}
+            {older && (
+              <li class="sm:ml-auto sm:max-w-[48%] sm:text-right">
+                <a href={url(`/places/${older.id}`)} class="group block">
+                  <span class="text-sm text-faint">Older <span aria-hidden="true">→</span></span>
+                  <span class="mt-1 block transition-colors group-hover:text-accent">{older.data.title}</span>
+                </a>
+              </li>
+            )}
+          </ul>
+        </nav>
+      )
+    }
+  </Container>
+</BaseLayout>
