@@ -87,6 +87,10 @@ const personSchema = {
      not prefers-color-scheme, or the browser chrome desyncs from the page. -->
 
 <link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} />
+{/* `alternate icon` is only reached by browsers that will not render the
+    SVG one; it carries its own dark ground since it cannot switch. */}
+<link rel="alternate icon" type="image/png" href={url('/favicon.png')} />
+<link rel="apple-touch-icon" href={url('/apple-touch-icon.png')} />
 <link rel="sitemap" href={url('/sitemap-index.xml')} />
 <link
   rel="alternate"

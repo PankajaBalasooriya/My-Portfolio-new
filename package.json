@@ -13,6 +13,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "sync": "astro sync",
+    "icons": "node scripts/build-icons.mjs",
     "lighthouse": "node scripts/lighthouse.mjs",
     "contrast": "node scripts/contrast.mjs"
   },
