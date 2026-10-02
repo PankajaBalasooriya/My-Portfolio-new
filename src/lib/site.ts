@@ -59,8 +59,8 @@ export const site = {
 
 export const nav = [
   { label: 'About', href: '/about' },
-  { label: 'Research', href: '/research' },
   { label: 'Projects', href: '/projects' },
+  { label: 'Research', href: '/research' },
   { label: 'Places', href: '/places' },
   { label: 'Writing', href: '/blog' },
   { label: 'CV', href: '/cv' },

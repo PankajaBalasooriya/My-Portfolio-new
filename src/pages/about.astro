@@ -2,15 +2,13 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import Section from '../components/Section.astro';
 import Prose from '../components/Prose.astro';
-import Tag from '../components/Tag.astro';
 import Timeline from '../components/Timeline.astro';
 import type { TimelineItem } from '../components/Timeline.astro';
 import { url } from '../lib/url';
 import { CV_PDF, CV_PDF_DOWNLOAD_NAME, hasCvPdf } from '../lib/cv';
 import { site, socials } from '../lib/site';
-import { getExperience, getEducationByKind, getStack, getCertificates } from '../lib/content';
+import { getExperience, getEducationByKind, getCertificates } from '../lib/content';
 
-const stack = await getStack();
 const experience = await getExperience();
 const education = await getEducationByKind();
 const certificates = await getCertificates();
@@ -61,27 +59,6 @@ const profiles = socials.filter((s) => !s.href.startsWith('mailto:'));
       anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem.
     </p>
   </Prose>
-
-  <Section title="Tools I work with" class="mt-16">
-    <dl class="space-y-6">
-      {
-        stack.map((group) => (
-          <div class="sm:grid sm:grid-cols-[9rem_1fr] sm:gap-x-8">
-            <dt class="text-sm text-faint sm:pt-1">{group.data.label}</dt>
-            <dd class="mt-2 sm:mt-0">
-              <ul class="flex flex-wrap gap-1.5">
-                {group.data.items.map((item) => (
-                  <li>
-                    <Tag>{item}</Tag>
-                  </li>
-                ))}
-              </ul>
-            </dd>
-          </div>
-        ))
-      }
-    </dl>
-  </Section>
 
   <Section title="Work experience" class="mt-16">
     <Timeline entries={workEntries} headingLevel={3} />
