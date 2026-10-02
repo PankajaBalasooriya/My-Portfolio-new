@@ -111,7 +111,11 @@ Things that look arbitrary later but were deliberate.
 
 **`/about` and `/cv` have different jobs.** `/about` is the narrative with a
 visual timeline; `/cv` is the complete record, print-ready, and the PDF. They
-briefly duplicated each other and it made both worse.
+briefly duplicated each other and it made both worse, and the split has only
+been drawn harder since: the certificates came off `/about` and live on `/cv`
+alone, and the tools list came off too (see below). What is left on `/about` is
+the biography, the work and education timelines, and contact. Anything that
+reads as an inventory belongs on `/cv`.
 
 **The homepage is the hero and featured projects, nothing else.** It once also
 carried research and writing sections. Research came off because
