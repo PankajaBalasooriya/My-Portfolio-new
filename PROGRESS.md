@@ -71,8 +71,8 @@ the real palette after a retheme rather than a copy that can drift.
 ## Routes
 
 ```
-/                    hero, featured projects, selected research, latest posts
-/about               bio, tools, work experience, education, contact
+/                    hero, featured projects
+/about               bio, work experience, education, contact
 /research            publications grouped by year
 /projects            filterable grid (CSS-only)
 /projects/[slug]     case study
@@ -113,9 +113,20 @@ Things that look arbitrary later but were deliberate.
 visual timeline; `/cv` is the complete record, print-ready, and the PDF. They
 briefly duplicated each other and it made both worse.
 
-**Tools stay on `/about`, not the homepage.** The homepage routes people to the
-work; a tool inventory competes with that and reads junior to a research
-audience. Considered and rejected — don't re-add it without a reason.
+**The homepage is the hero and featured projects, nothing else.** It once also
+carried research and writing sections. Research came off because
+`getResearch()` sorts by year before status, so two CHI 2027 submissions led
+the front page while the papers with DOIs were pushed down — the homepage
+advertising unreviewed work. Writing came off after it. One route into the work
+beats three competing lists, and `/research` and `/blog` still hold everything.
+`ResearchEntry`'s `compact` prop is the remnant of the research section and is
+kept on purpose for when a short listing returns.
+
+**Tools live on neither page.** They were on `/about` and deliberately kept off
+the homepage, where a tool inventory competes with the work and reads junior to
+a research audience. The `/about` section has since been removed too, so
+`stack.yaml` currently renders nowhere. The data is kept; re-adding a section is
+easier than restoring a collection.
 
 **No proficiency bars on the stack.** Unverifiable, they age badly, and the
 domain grouping already communicates range.

@@ -5,7 +5,11 @@ import { url } from '../lib/url';
 
 interface Props {
   entry: CollectionEntry<'research'>;
-  /** Homepage shows a trimmed version without the abstract. */
+  /**
+   * Trims the abstract, for a listing that is not the full research page.
+   * Nothing passes it since the homepage's research section was removed —
+   * kept deliberately, for when a short listing comes back. See PROGRESS.md.
+   */
   compact?: boolean;
 }
 

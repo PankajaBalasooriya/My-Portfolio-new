@@ -4,14 +4,10 @@ import Container from '../components/Container.astro';
 import Hero from '../components/Hero.astro';
 import Section from '../components/Section.astro';
 import ProjectCard from '../components/ProjectCard.astro';
-import PostCard from '../components/PostCard.astro';
-import ResearchEntry from '../components/ResearchEntry.astro';
 import { site } from '../lib/site';
-import { getFeaturedProjects, getResearch, getPosts } from '../lib/content';
+import { getFeaturedProjects } from '../lib/content';
 
 const featured = await getFeaturedProjects();
-const research = (await getResearch()).slice(0, 3);
-const posts = (await getPosts()).slice(0, 3);
 ---
 
 <BaseLayout title={site.title} description={site.description}>
@@ -28,30 +24,6 @@ const posts = (await getPosts()).slice(0, 3);
               </li>
             ))}
           </ul>
-        </Section>
-      )
-    }
-
-    {
-      research.length > 0 && (
-        <Section title="Selected research" href="/research" linkLabel="All research" class="mt-20">
-          <div>
-            {research.map((entry) => (
-              <ResearchEntry entry={entry} compact />
-            ))}
-          </div>
-        </Section>
-      )
-    }
-
-    {
-      posts.length > 0 && (
-        <Section title="Latest writing" href="/blog" linkLabel="All posts" class="mt-20">
-          <div>
-            {posts.map((post) => (
-              <PostCard post={post} headingLevel={3} />
-            ))}
-          </div>
         </Section>
       )
     }
