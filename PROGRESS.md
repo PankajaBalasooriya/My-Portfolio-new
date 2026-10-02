@@ -214,36 +214,36 @@ through `url()` in [src/lib/url.ts](src/lib/url.ts).
 
 ### Still placeholder
 
-Experience and education are filled in from the CV. These are not.
+Every YAML collection is now real, from the CV. What is left is prose.
 
-4. **`research.yaml`** — the CV lists three real publications (VibeCoP, under
-   review at ACM UIST 2026; Listen to the Plant, conditionally accepted at ACM
-   DIS 2026; SymbioSip, accepted at ACM DIS 2026 Interactivity).
-5. **`awards.yaml`** — the CV lists seven, including 1st Runner Up at the Sri
-   Lanka Robotics Challenge and 1st Runner Up at Robofest 2025 Open Category.
-6. **`volunteering.yaml`** — IEEE Student Branch and Electronic Club roles.
-7. **`projects/`** — two Lorem entries; the CV describes eleven real ones.
-8. **`stack.yaml`** — still guesswork. The CV's skills summary is the real
-    list: STM32Cube, PlatformIO, FreeRTOS, ESP-IDF, Altium, SolidWorks, ROS 2
-    Humble, Gazebo, Webots, RViz, ArduPilot, TensorFlow, PyTorch, OpenCV, YOLO,
-    scikit-learn, Edge Impulse, React, Flask, Node-RED, MQTT.
-9. **`places/`** — Colombo, Kandy, Melbourne and Singapore are visibly labelled,
-   noindex sample entries. Replace their dates, prose and SVG artwork with verified
-   stories and original media before removing `placeholder: true`.
+3. **`projects/`** — two Lorem entries against eleven real ones on the CV, and
+   they now carry the whole homepage on their own. The /about copy also names
+   two the site cannot show: the final-year project on cooperative multi-drone
+   payload transport, and the autonomous driving stacks.
+4. **`blog/`** — three Lorem posts, one of them a draft. An empty blog is
+   unremarkable, so deleting them is as legitimate as writing real ones.
+5. **`places/`** — Colombo, Kandy, Melbourne and Singapore are visibly
+   labelled, noindex sample entries. Replace their dates, prose and SVG artwork
+   with verified stories and original media before removing `placeholder: true`.
 
-### Assets
+### Elsewhere
 
-10. **`public/og-default.png`** is still the generated placeholder card, so link
-    previews on LinkedIn, X and Slack show a stand-in rather than anything real.
+6. **`public/cv.pdf` is out of date.** It is built from LaTeX outside this
+   repo, so nothing here regenerates it, and it still shows the Exertion Games
+   Lab internship as ongoing, the Moratuwa TA role starting in August rather
+   than May, and VibeCoP under review at UIST. The site and the downloadable CV
+   now disagree, and the PDF is the one people forward. Keep the filename.
+7. **`stack.yaml` renders nowhere** since the tools section came off /about.
+   The data is real and current; it just has no page.
 
 ### Optional
 
-11. `site.location` is deliberately empty — set it and the About page picks it up.
-12. `~9 MB` of source PNGs in the repo (`portrait.png`, `portrait-landscape.png`).
-   Harmless, and it preserves quality for re-crops; JPEG would cut it to well
-   under a megabyte.
-13. The `/projects` filter state isn't in the URL, so a filtered view isn't
+8. `site.location` is deliberately empty — set it and the About page picks it up.
+9. `~4 MB` of source PNGs in the repo (the two portrait crops and the brand
+   masters). Harmless, and it preserves quality for re-crops and re-rendering
+   the icons; JPEG would cut the portraits to well under a megabyte.
+10. The `/projects` filter state isn't in the URL, so a filtered view isn't
     shareable — the deliberate price of zero JavaScript.
-14. Contact block profile links repeat the footer's, roughly 40px apart.
-15. Lighthouse in CI is advisory only (`continue-on-error`), because scores
+11. Contact block profile links repeat the footer's, roughly 40px apart.
+12. Lighthouse in CI is advisory only (`continue-on-error`), because scores
     against a live URL vary on shared runners.

@@ -206,9 +206,13 @@ files['apple-touch-icon.png'] = await badge(onDark, 180);
 
 /**
  * The link-preview card. 1200x630 is what Open Graph consumers expect, but
- * most of them also render it small, so this stays to the mark, the name and
- * one line: anything more is unreadable in a feed. Dark ground because the
- * card has to commit to one theme and the site's own is dark.
+ * most of them also render it small, so the text stays to the mark, the name
+ * and the affiliation: anything more is unreadable in a feed. Dark ground,
+ * because the card has to commit to one theme and the site's own is dark.
+ *
+ * The portrait takes the right third at full bleed. It is the 3:4 hero crop
+ * cover-fitted to a taller frame, which trims the sides rather than the
+ * subject, who sits centred in that crop already.
  */
 const siteTs = await readFile(fileURLToPath(new URL('src/lib/site.ts', root)), 'utf8');
 
@@ -228,24 +232,43 @@ function fromSite(key) {
     .replace(/>/g, '&gt;');
 }
 
-const OG = {
-  name: fromSite('shortName'),
-  line: fromSite('headline'),
-  foot: fromSite('study'),
-};
+/** Split at the first separator only, so any later one stays in the tail. */
+function splitOnce(value, separator) {
+  const at = value.indexOf(separator);
+  return at === -1 ? [value, ''] : [value.slice(0, at), value.slice(at + separator.length)];
+}
+
+/** Where the photo starts, and so where the text column has to stop. */
+const PHOTO_X = 800;
+const TEXT_END = PHOTO_X - 60;
+
+// The study line is too long to set on one line beside the photo, and it
+// already carries its own break: "<course>, <university>".
+const [course, university] = splitOnce(fromSite('study'), ', ');
 
 const ogMark = await sharp(onDark).resize(92, 92).png().toBuffer();
+const ogPhoto = await sharp(fileURLToPath(new URL('src/assets/portrait.png', root)))
+  .resize(1200 - PHOTO_X, 630, { fit: 'cover', position: 'centre' })
+  .png()
+  .toBuffer();
+
 const ogCard = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
   <rect width="1200" height="630" fill="#14141a"/>
-  <text x="80" y="372" font-family="Fraunces" font-size="82" fill="#eae8e3">${OG.name}</text>
-  <text x="80" y="428" font-family="Inter" font-size="32" fill="#aeaaa2">${OG.line}</text>
-  <line x1="80" y1="502" x2="1120" y2="502" stroke="#2f2f3a" stroke-width="1"/>
-  <text x="80" y="546" font-family="Inter" font-size="24" fill="#89847b">${OG.foot}</text>
+  <text x="80" y="330" font-family="Fraunces" font-size="72" fill="#eae8e3">${fromSite('shortName')}</text>
+  <line x1="80" y1="392" x2="${TEXT_END}" y2="392" stroke="#2f2f3a" stroke-width="1"/>
+  <text x="80" y="436" font-family="Inter" font-size="23" fill="#89847b">${course}</text>
+  <text x="80" y="470" font-family="Inter" font-size="23" fill="#89847b">${university}</text>
 </svg>`);
 
-files['og-default.png'] = await sharp(ogCard)
-  .composite([{ input: ogMark, left: 80, top: 72 }])
-  .png({ compressionLevel: 9 })
+// JPEG, not PNG: the card is mostly photograph now. A palette PNG dithers
+// visibly around hard edges against the sky, and a truecolour one is 622 kB
+// against 57.
+files['og-default.jpg'] = await sharp(ogCard)
+  .composite([
+    { input: ogPhoto, left: PHOTO_X, top: 0 },
+    { input: ogMark, left: 80, top: 150 },
+  ])
+  .jpeg({ quality: 84, mozjpeg: true, chromaSubsampling: '4:4:4' })
   .toBuffer();
 
 await mkdir(fileURLToPath(new URL('public', root)), { recursive: true });

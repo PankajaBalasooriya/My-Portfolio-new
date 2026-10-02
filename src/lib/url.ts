@@ -18,7 +18,7 @@ export function url(path = '/'): string {
 
 /**
  * Absolute URL for a site-root-relative path (base path applied).
- * Use for links you author, e.g. absoluteUrl('/og-default.png', Astro.site).
+ * Use for links you author, e.g. absoluteUrl('/og-default.jpg', Astro.site).
  */
 export function absoluteUrl(path: string, site: URL | undefined): string {
   return new URL(url(path), site).href;

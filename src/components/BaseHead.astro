@@ -10,7 +10,7 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description?: string;
-  /** Site-root-relative path to an OG image, e.g. "/og-default.png". */
+  /** Site-root-relative path to an OG image, e.g. "/og-default.jpg". */
   image?: string;
   type?: 'website' | 'article';
   publishedTime?: Date;
@@ -21,7 +21,7 @@ interface Props {
 const {
   title,
   description = site.description,
-  image = '/og-default.png',
+  image = '/og-default.jpg',
   type = 'website',
   publishedTime,
   modifiedTime,
