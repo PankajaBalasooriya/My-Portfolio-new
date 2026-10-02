@@ -110,6 +110,17 @@ const { class: className = '' } = Astro.props;
     border: 1px solid var(--c-border);
   }
 
+  .prose-body :global(figure) {
+    margin-block: 2em;
+  }
+
+  .prose-body :global(figcaption) {
+    margin-top: 0.65em;
+    font-size: 0.875em;
+    line-height: 1.5;
+    color: var(--c-faint);
+  }
+
   .prose-body :global(hr) {
     margin-block: 2.5em;
   }
