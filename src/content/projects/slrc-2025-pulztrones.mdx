@@ -1,0 +1,137 @@
+---
+title: 'Pulztrones: SLRC 2025 autonomous robot'
+summary: >-
+  A two-processor robot for the Sri Lanka Robotics Challenge: a Raspberry Pi
+  for vision, an STM32 for motion and the arm, and a framed UART link between
+  them. 1st runner-up in the university category.
+role: Team lead, Pulztrones
+period: '2025'
+tags: ['robotics', 'embedded', 'computer-vision']
+stack: ['STM32F446RE', 'Raspberry Pi 4B', 'Embedded C', 'Python', 'OpenCV', 'SolidWorks']
+repo: https://github.com/PankajaBalasooriya/SLRC-2025-Pulztrones
+featured: true
+order: 1
+cover: ../../assets/projects/slrc-2025-pulztrones.jpg
+coverAlt: >-
+  The robot on the SLRC arena floor, its arm holding an orange ball above a
+  grid of black and green lines.
+---
+
+import { Image } from 'astro:assets';
+import hiddenTask from '../../assets/projects/slrc-hidden-task.jpg';
+import awards from '../../assets/projects/slrc-awards.jpg';
+
+The Sri Lanka Robotics Challenge runs its university category as a single arena
+with a chain of tasks: a plantation grid, a muddy road, a ramp, a QR code to
+read, a collection point, potatoes to sort, two warehouses, an outdoor section,
+and a hidden task revealed only on the day. A robot has to get through all of
+it without a driver. Ours placed 1st runner-up.
+
+## Two processors, one serial link
+
+A Raspberry Pi 4B handles perception, where the work is image processing and
+nothing is real-time. An STM32F446RE handles motion, where a late control loop
+means a robot in the wall. Neither is much good at the other's job.
+
+They talk over UART with framed packets: a start marker, a command byte, the
+payload, an end marker. Line detections, grid positions and colour readings go
+one way; the firmware sends back encoder counts, IR values and time-of-flight
+distances, which made the link double as a debug channel during tuning.
+
+## Motion
+
+Everything runs on a 50 Hz tick. Driving splits into a forward axis and a
+rotational one, each with its own PID error term and each fed by a trapezoidal
+profile: a state machine over accelerating, braking and finished that
+integrates speed and position every tick. Asking for a 300 mm move or a 90
+degree turn becomes a profile the controller tracks, rather than a distance the
+robot approaches and overshoots.
+
+The gains are not hand-tuned. Both axes were identified as first-order systems,
+each measured for a DC gain and a time constant:
+
+| Axis | Km | Tm |
+| --- | --- | --- |
+| Forward | 977.54 mm/s per volt | 0.257 s |
+| Rotation | 595.55 deg/s per volt | 0.166 s |
+
+The gains then fall out of the model, at a damping ratio of 0.707 and with the
+derivative time set equal to the time constant:
+
+`Kp = 16·Tm / (Km·ζ²·Td²)` and `Kd = f·(8·Tm − Td) / (Km·Td)`
+
+Feedforward comes from the same two numbers: `1/Km` holds a steady speed,
+`Tm/Km` covers acceleration, and a measured 0.18 V bias gets the motors off
+their stiction. It can be switched off independently of the PID, which is how
+you find out which half is misbehaving. Retuning after a mechanical change
+means re-measuring Km and Tm rather than twiddling four numbers by feel.
+
+Odometry is 0.0616 mm per encoder count, with heading taken from the wheel
+difference across a 93.5 mm half-track. Line following runs at 85 mm/s under
+120 mm/s² of acceleration; spin turns at 150 deg/s under 50 deg/s²; the
+plantation grid is 153 mm cell to cell.
+
+Steering is a separate PD loop layered on top, clamped to 0.6 deg/s of
+correction so one bad range reading cannot swing the robot off line. It holds a
+left wall, a right wall, a front wall, a line, or a grid centre, and the task
+code switches mode as the arena changes under it. Walls register above a
+threshold of 80 counts to the side and 75 ahead, against nominal standoffs of
+90 mm and 80 mm.
+
+## The arm
+
+A four-servo arm on a PCA9685 picks balls and places them. Each move
+interpolates in one degree steps at 15 ms intervals rather than sending the
+servo straight to its target, which keeps the chassis from rocking when the arm
+swings out over the edge of the wheelbase.
+
+The end effector is a vacuum gripper rather than a claw, which is the easier
+mechanism for a sphere: no alignment, no grip force to get right. An onboard
+colour sensor reads the ball at the pickup pose, the pump runs for two seconds
+to lift it, and the arm drops it into one of two bins by that reading, each
+released by its own servo gate.
+
+The arm, its mounts and the storage gearing were modelled in SolidWorks and
+3D printed, with the chassis plates laser cut.
+
+## Vision
+
+Ball and line detection run in HSV rather than RGB, so a threshold survives the
+arena lighting changing between practice and the final. Balls are caught by two
+bands: hue 10 to 35 above saturation and value 100 for the orange and yellow
+ones, and anything under saturation 30 and over value 170 for the white ones,
+which is the only way to describe white without naming a hue at all.
+
+The pipeline is a 7x7 Gaussian at σ 1.5, the two masks, a morphological open
+then close to kill speckle, then contours. It only runs on a strip at the
+bottom of the frame, the part of the floor the robot is about to drive over.
+That cuts the false positives and the per-frame cost together.
+
+Vision carried the elimination round. The final run leaned on the IR and
+time-of-flight sensors, which are less interesting and more reliable.
+
+## On the day
+
+<figure>
+  <Image
+    src={hiddenTask}
+    alt="Two team members on the competition floor, one holding the robot while the other works at a laptop."
+    widths={[640, 1080]}
+    sizes="(min-width: 768px) 48rem, 100vw"
+  />
+  <figcaption>
+    Programming the hidden task, which is only announced on the day.
+  </figcaption>
+</figure>
+
+<figure>
+  <Image
+    src={awards}
+    alt="The team on stage holding an oversized cheque reading SLRC 2025, University Category, 1st Runner-Up."
+    widths={[640, 1080]}
+    sizes="(min-width: 768px) 48rem, 100vw"
+  />
+  <figcaption>
+    1st runner-up in the university category.
+  </figcaption>
+</figure>
