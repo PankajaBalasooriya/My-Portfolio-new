@@ -1,6 +1,7 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
+import { url } from '../../lib/url';
 import { getProjects, getProjectTags } from '../../lib/content';
 
 const projects = await getProjects();
@@ -18,15 +19,22 @@ const filterCss = tags
     (tag) => `#project-filter:has(#${tagId(tag)}:checked) ~ #project-grid > li:not([data-tags~="${tag}"]) { display: none; }`,
   )
   .join('\n');
+/** One project is nothing to filter, and the lede should not promise it. */
+const filterable = projects.length > 1;
 ---
 
 <PageLayout
   title="Projects"
   description="Hardware, embedded, and machine learning projects."
-  lede="Things I have designed, built, and shipped. Filter by tag."
+  lede={
+    filterable
+      ? 'Things I have designed, built, and shipped. Filter by tag.'
+      : 'Things I have designed, built, and shipped.'
+  }
 >
   <div
     id="project-filter"
+    hidden={!filterable}
     role="group"
     aria-label="Filter projects by tag"
     class="mb-8 flex flex-wrap gap-2"
@@ -63,6 +71,16 @@ const filterCss = tags
       ))
     }
   </ul>
+
+  <p class="mt-10 border-t border-border pt-6 text-sm text-muted">
+    Most of my projects are not written up yet. The rest are listed on the{' '}
+    <a
+      href={url('/cv')}
+      class="text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover"
+      >CV</a
+    >, including the final-year project on cooperative multi-drone payload
+    transport.
+  </p>
 
   <style is:inline set:html={filterCss} />
 </PageLayout>
