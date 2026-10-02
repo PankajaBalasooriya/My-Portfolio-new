@@ -2,14 +2,18 @@
 import PageLayout from '../../layouts/PageLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import Tag from '../../components/Tag.astro';
+import { url } from '../../lib/url';
 import { getPosts, getPostTags } from '../../lib/content';
+
+const LINK =
+  'text-accent underline decoration-1 underline-offset-4 transition-colors hover:text-accent-hover';
 
 const posts = await getPosts();
 const tags = await getPostTags();
 ---
 
 <PageLayout
-  title="Writing"
+  title="Blog"
   description="Notes on electronics, embedded systems, machine learning, and research."
   lede="Occasional notes on things I have built, broken, or read."
 >
@@ -37,7 +41,12 @@ const tags = await getPostTags();
         ))}
       </div>
     ) : (
-      <p class="text-muted">No posts yet.</p>
+      <p class="max-w-[60ch] text-muted">
+        Nothing written up here yet. The posts are still to come; in the
+        meantime, <a href={url('/projects')} class={LINK}>projects</a> and{' '}
+        <a href={url('/research')} class={LINK}>research</a> carry the actual
+        work.
+      </p>
     )
   }
 </PageLayout>

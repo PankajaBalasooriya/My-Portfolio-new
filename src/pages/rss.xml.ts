@@ -8,7 +8,7 @@ export async function GET(context: APIContext) {
   const posts = await getPosts();
 
   return rss({
-    title: `${site.name} — Writing`,
+    title: `${site.name} — Blog`,
     description: site.description,
     // Must carry the base path: context.site is the bare origin.
     site: absoluteUrl('/', context.site),
