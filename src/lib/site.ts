@@ -4,8 +4,20 @@ export const site = {
   name: 'Pankaja Balasooriya',
   shortName: 'Pankaja Balasooriya',
   title: 'Pankaja Balasooriya',
+  /**
+   * The homepage title only. `title` stays the bare name because every other
+   * page appends it, and "About · Pankaja Balasooriya — Robotics, Embedded
+   * Systems, HCI" would be unreadable. A name alone uses about a third of the
+   * line a search result gives you.
+   */
+  homeTitle: 'Pankaja Balasooriya — Robotics, Embedded Systems, HCI',
+  /**
+   * Kept under 150 characters: Google truncates around there, and social
+   * previews cut sooner still. Spelled "and" rather than "&" because the meta
+   * tag escapes it to `&amp;`, which costs four more characters than it looks.
+   */
   description:
-    'Electronic & Telecommunication Engineering undergraduate working across robotics, embedded hardware, machine learning, and human-computer interaction research.',
+    'Electronic and Telecommunication Engineering undergraduate working across robotics, embedded hardware, machine learning and HCI research.',
   tagline:
     'I build intelligent systems end to end — from custom electronics and firmware to the software and learning algorithms that drive them.',
   /**

@@ -30,7 +30,8 @@ const {
 
 const canonical = absoluteFromPathname(Astro.url.pathname, Astro.site);
 const ogImage = absoluteUrl(image, Astro.site);
-const fullTitle = title === site.title ? title : `${title} · ${site.title}`;
+const standalone = title === site.title || title === site.homeTitle;
+const fullTitle = standalone ? title : `${title} · ${site.title}`;
 
 // A real photograph is a better Person image than the generic OG card.
 const portrait = await getImage({ src: portraitSrc, width: 600, format: 'jpeg' });

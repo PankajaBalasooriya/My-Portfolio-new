@@ -10,7 +10,7 @@ import { getFeaturedProjects } from '../lib/content';
 const featured = await getFeaturedProjects();
 ---
 
-<BaseLayout title={site.title} description={site.description}>
+<BaseLayout title={site.homeTitle} description={site.description}>
   <Container class="py-16 sm:py-24">
     <Hero />
 
