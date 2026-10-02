@@ -24,7 +24,7 @@ the copy and data are still placeholders.
 | All CV-derived data | Done — experience, education, research, awards, volunteering, certificates, stack |
 | Institution logos | Done |
 | Places experience | Built — interactive globe, filters, typed entries, detail pages; sample content only |
-| **Real copy** (hero, biography) | **Not started** |
+| Real copy (hero, biography) | Biography done, in the owner's words |
 | **Projects and blog** | **Still placeholder** |
 
 Lighthouse on the live domain: **100 / 100 / 100 / 100 / 100** (median of 3,
@@ -200,14 +200,14 @@ through `url()` in [src/lib/url.ts](src/lib/url.ts).
 
 ### Content — the real remaining work
 
-1. **Hero copy.** `site.hero.headline` and `.sub` are still the placeholder
-   tagline. "I build intelligent systems end to end" could describe thousands
-   of engineers; specificity is the biggest single improvement available.
-2. **A proof line and an intent line.** What you've shipped or published, and
-   what you're looking for (e.g. PhD positions and when). The second is the
-   highest-value sentence on the site for the people most likely to act on it.
-3. **The `/about` biography** — three Lorem paragraphs currently carrying the
-   whole page.
+1. **Hero copy.** `site.hero.headline` and `.sub` were called placeholder here,
+   on the grounds that "I build intelligent systems end to end" could describe
+   thousands of engineers. The owner has since written the same line into the
+   /about standfirst, so treat it as chosen rather than left over.
+2. **An intent line.** What you're looking for and when (e.g. PhD positions).
+   This is the highest-value sentence on the site for the people most likely to
+   act on it, and it is the one thing the About page still does not say.
+
 ### Still placeholder
 
 Experience and education are filled in from the CV. These are not.
