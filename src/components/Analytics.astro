@@ -1,0 +1,39 @@
+---
+/**
+ * Google Analytics 4, production builds only — `astro dev` would otherwise
+ * report every local page load as real traffic.
+ *
+ * The measurement ID is public by design: it ships in the page source of every
+ * site that uses GA, and it identifies a destination rather than granting
+ * access to anything. It belongs in site.ts, not in an env var.
+ *
+ * Rendered last in <head>. The charset meta has to fall inside the first 1024
+ * bytes browsers sniff, so nothing may be added above it.
+ */
+import { site } from '../lib/site';
+
+const enabled = import.meta.env.PROD && site.analyticsId.length > 0;
+---
+
+{
+  enabled && (
+    <>
+      <script
+        is:inline
+        async
+        src={`https://www.googletagmanager.com/gtag/js?id=${site.analyticsId}`}
+      />
+      {/* `define:vars` wraps this in an IIFE, so `gtag` is assigned to window
+          rather than declared: a bare function declaration would be scoped to
+          the wrapper and `gtag('event', …)` would fail anywhere else. */}
+      <script is:inline define:vars={{ id: site.analyticsId }}>
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function gtag() {
+          window.dataLayer.push(arguments);
+        };
+        gtag('js', new Date());
+        gtag('config', id);
+      </script>
+    </>
+  )
+}

@@ -44,11 +44,20 @@ dev: typescript 5.9  @astrojs/check  lighthouse 13  chrome-launcher
 
 Astro is pinned to 5 deliberately — bare `astro` now resolves to 7.
 
-**Client-side JavaScript is limited to the theme toggle and `/places`.** Page
-transitions use the native CSS `@view-transition` rule rather than Astro's
-`ClientRouter`, and the `/projects` tag filter is pure CSS (`:has()` plus radio
-inputs). Places uses a route-scoped Cobe enhancement for the globe and filters;
-its complete content remains available without JavaScript.
+**Our own client-side JavaScript is limited to the theme toggle and
+`/places`.** Page transitions use the native CSS `@view-transition` rule rather
+than Astro's `ClientRouter`, and the `/projects` tag filter is pure CSS
+(`:has()` plus radio inputs). Places uses a route-scoped Cobe enhancement for
+the globe and filters; its complete content remains available without
+JavaScript.
+
+**Google Analytics is the exception**, and the only third-party script on the
+site. `src/components/Analytics.astro` emits gtag.js on every page, production
+builds only, so `astro dev` does not report local page loads as traffic. It
+costs nothing measurable: median of 3 still scores 100 across every Lighthouse
+category. It does set cookies, so visitors in the EU and UK are owed a consent
+banner the site does not currently have. A cookieless analytics service would
+remove that obligation.
 
 ---
 

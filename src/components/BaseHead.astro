@@ -80,6 +80,9 @@ const personSchema = {
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
+{site.googleSiteVerification && (
+  <meta name="google-site-verification" content={site.googleSiteVerification} />
+)}
 {noindex && <meta name="robots" content="noindex, nofollow" />}
 
 <!-- theme-color lives in ThemeScript.astro: it must track the resolved theme,

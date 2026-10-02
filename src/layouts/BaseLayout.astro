@@ -1,4 +1,5 @@
 ---
+import Analytics from '../components/Analytics.astro';
 import BaseHead from '../components/BaseHead.astro';
 import ThemeScript from '../components/ThemeScript.astro';
 import SkipLink from '../components/SkipLink.astro';
@@ -29,6 +30,7 @@ const { bare = false, ...head } = Astro.props;
     <meta charset="utf-8" />
     <ThemeScript />
     <BaseHead {...head} />
+    <Analytics />
   </head>
   <body class="flex min-h-screen flex-col">
     <SkipLink />

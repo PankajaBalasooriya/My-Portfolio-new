@@ -68,6 +68,18 @@ export const site = {
     'Multi-agent reinforcement learning',
     'Human-computer interaction',
   ],
+  /**
+   * Google Analytics 4 measurement ID. Public by design — it ships in the page
+   * source wherever GA is used. Empty string disables the tag entirely.
+   */
+  analyticsId: 'G-MH6J1986WR',
+  /**
+   * Search Console's HTML-tag verification token: the `content` value only,
+   * not the whole meta element. Empty means no tag is emitted, which is the
+   * right default — a wrong token is worse than none. Verification survives as
+   * long as the tag stays, so do not remove it after Search Console confirms.
+   */
+  googleSiteVerification: '' as string,
   locale: 'en',
   ogLocale: 'en_US',
   author: {
