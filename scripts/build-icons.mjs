@@ -1,8 +1,9 @@
 /**
- * Regenerate the site icons in public/ from the brand masters.
+ * Regenerate the site icons and the link-preview card in public/ from the
+ * brand masters.
  *
- *   pnpm icons                 # rewrite favicon.svg, favicon.png, apple-touch-icon.png
- *   pnpm icons --check         # fail if the committed icons are stale
+ *   pnpm icons                 # rewrite favicon.svg/.png, apple-touch-icon, og-default
+ *   pnpm icons --check         # fail if any of them are stale
  *
  * The masters in src/assets/brand are flat RGB — the artwork is already
  * composited onto solid white (mark-on-light) or solid black (mark-on-dark),
@@ -10,14 +11,43 @@
  * blue wedge, so this un-mattes instead: it solves each pixel back to the
  * colour and coverage it had before compositing, which keeps anti-aliased
  * edges clean and the accent at full saturation.
+ *
+ * scripts/fonts holds static instances of the same two variable fonts the site
+ * serves, so the card is set in the site's own faces rather than whatever
+ * librsvg finds. They exist because fontconfig cannot read woff2 and because
+ * the variable defaults are the wrong cut (Fraunces defaults to opsz 9 at
+ * weight 900). Regenerate them with fontTools if the webfonts ever change:
+ *
+ *   f = TTFont('src/assets/fonts/fraunces-latin-opsz.woff2'); f.flavor = None
+ *   instancer.instantiateVariableFont(f, {'opsz': 144, 'wght': 600}, inplace=True)
+ *
+ * with Inter instanced at {'wght': 400}, both renamed to the bare family name.
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import sharp from 'sharp';
 
 const root = new URL('../', import.meta.url);
 const master = (name) => fileURLToPath(new URL(`src/assets/brand/${name}`, root));
 const out = (name) => fileURLToPath(new URL(`public/${name}`, root));
+
+// Point fontconfig at our two faces and nothing else, before sharp loads and
+// librsvg initialises it. Listing only this directory also keeps the render
+// deterministic: there is no system font to silently substitute.
+const fontDir = fileURLToPath(new URL('fonts', import.meta.url));
+const fontCache = join(tmpdir(), 'portfolio-og-fontcache');
+const fontConf = join(tmpdir(), 'portfolio-og-fonts.conf');
+await mkdir(fontCache, { recursive: true });
+await writeFile(
+  fontConf,
+  `<?xml version="1.0"?><!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig><dir>${fontDir}</dir><cachedir>${fontCache}</cachedir></fontconfig>
+`,
+);
+process.env.FONTCONFIG_FILE = fontConf;
+
+const { default: sharp } = await import('sharp');
 
 const CHECK = process.argv.includes('--check');
 
@@ -173,6 +203,50 @@ files['favicon.svg'] = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" xmln
 // and Apple composites a transparent home-screen icon onto white.
 files['favicon.png'] = await badge(onDark, 96);
 files['apple-touch-icon.png'] = await badge(onDark, 180);
+
+/**
+ * The link-preview card. 1200x630 is what Open Graph consumers expect, but
+ * most of them also render it small, so this stays to the mark, the name and
+ * one line: anything more is unreadable in a feed. Dark ground because the
+ * card has to commit to one theme and the site's own is dark.
+ */
+const siteTs = await readFile(fileURLToPath(new URL('src/lib/site.ts', root)), 'utf8');
+
+/**
+ * Pulled out of site.ts rather than restated here, so the card cannot drift
+ * from the page. A plain node script can't import the TypeScript, hence the
+ * read: each key is unique in the file, and a miss throws rather than
+ * silently rendering a card with a hole in it.
+ */
+function fromSite(key) {
+  const match = siteTs.match(new RegExp(`\\b${key}:\\s*'((?:[^'\\\\]|\\\\.)*)'`));
+  if (!match) throw new Error(`build-icons: no '${key}' found in src/lib/site.ts`);
+  return match[1]
+    .replace(/\\'/g, "'")
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+const OG = {
+  name: fromSite('shortName'),
+  line: fromSite('headline'),
+  foot: fromSite('study'),
+};
+
+const ogMark = await sharp(onDark).resize(92, 92).png().toBuffer();
+const ogCard = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
+  <rect width="1200" height="630" fill="#14141a"/>
+  <text x="80" y="372" font-family="Fraunces" font-size="82" fill="#eae8e3">${OG.name}</text>
+  <text x="80" y="428" font-family="Inter" font-size="32" fill="#aeaaa2">${OG.line}</text>
+  <line x1="80" y1="502" x2="1120" y2="502" stroke="#2f2f3a" stroke-width="1"/>
+  <text x="80" y="546" font-family="Inter" font-size="24" fill="#89847b">${OG.foot}</text>
+</svg>`);
+
+files['og-default.png'] = await sharp(ogCard)
+  .composite([{ input: ogMark, left: 80, top: 72 }])
+  .png({ compressionLevel: 9 })
+  .toBuffer();
 
 await mkdir(fileURLToPath(new URL('public', root)), { recursive: true });
 
