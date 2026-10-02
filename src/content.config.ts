@@ -211,6 +211,12 @@ const research = defineCollection({
       .enum(['published', 'accepted', 'conditionally-accepted', 'under-review'])
       .default('published'),
     doi: z.string().optional(),
+    /**
+     * Page range within the proceedings, e.g. "315-319". Only exists once the
+     * work is actually published, so it stays optional and renders on the CV,
+     * where a full citation belongs.
+     */
+    pages: z.string().optional(),
     pdf: z.string().optional(),
     code: z.string().url().optional(),
     abstract: z.string().optional(),

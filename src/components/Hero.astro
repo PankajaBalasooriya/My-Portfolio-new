@@ -51,8 +51,16 @@ const alt =
       </p>
 
       <p class="mt-5 max-w-[52ch] text-sm text-faint">
-        {site.role.study}<span class="mx-1.5" aria-hidden="true">·</span
-        >{site.role.affiliation}
+        {site.role.study}{
+          site.role.affiliation && (
+            <>
+              <span class="mx-1.5" aria-hidden="true">
+                ·
+              </span>
+              {site.role.affiliation}
+            </>
+          )
+        }
       </p>
 
       <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">

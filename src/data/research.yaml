@@ -1,19 +1,5 @@
 # Author lists follow the CV exactly. "Balasooriya, P." is emphasised in the
 # rendered list — see OWNER in src/components/ResearchEntry.astro.
-- id: vibecop-uist-2026
-  title: 'VibeCoP: Enhancing the Proprioception of Center of Pressure using Vibrotactile Feedback'
-  authors:
-    - Balasooriya, P.
-    - Pathirana, R.O.
-    - Warushavithana, N.D.
-    - Ravishan, N.
-    - Sabnis, N.
-    - Elvitigala, D.S.
-  venue: ACM UIST
-  year: 2026
-  type: paper
-  status: under-review
-
 - id: listen-to-the-plant-dis-2026
   title: 'Listen to the Plant: Exploring the Design of Plant Care as an Auditory Interface to Promote Caregiving Behavior'
   authors:
@@ -23,10 +9,12 @@
     - Wang, H.
     - Elvitigala, D.S.
     - Mueller, F.
-  venue: ACM DIS (Provocation / Work-in-Progress)
+  venue: ACM DIS Companion (Provocation / Work-in-Progress)
   year: 2026
   type: paper
-  status: conditionally-accepted
+  status: published
+  doi: 10.1145/3802974.3809437
+  pages: '315-319'
 
 - id: symbiosip-dis-2026
   title: 'SymbioSip: Human-Plant Symbiosis through a Bidirectional Hydration System'
@@ -40,7 +28,55 @@
     - Elvitigala, D.S.
     - Toups Dugas, P.O.
     - Mueller, F.
-  venue: ACM DIS Interactivity
+  venue: ACM DIS Companion (Interactivity)
+  year: 2026
+  type: demo
+  status: published
+  doi: 10.1145/3802974.3808024
+  pages: '566-570'
+
+- id: demonstrating-vibecop-sportshci-2026
+  title: 'Demonstrating VibeCoP: Guiding Balance Exercises through a Center of Pressure encoded Vibrotactile Waistband'
+  authors:
+    - Pathirana, R.O.
+    - Balasooriya, P.
+    - Warushavithana, N.D.
+    - Ravishan, N.
+    - Sabnis, N.
+    - Mueller, F.
+    - Elvitigala, D.S.
+  venue: SportsHCI
   year: 2026
   type: demo
   status: accepted
+
+- id: copsense-chi-2027
+  title: 'CoPSense: Improving control over user''s Center of Pressure using passive vibrotactile feedback'
+  authors:
+    - Pathirana, R.O.
+    - Balasooriya, P.
+    - Ravishan, N.
+    - Warushavithana, N.D.
+    - Mueller, F.
+    - Sabnis, N.
+    - Elvitigala, D.S.
+  venue: ACM CHI
+  year: 2027
+  type: paper
+  status: under-review
+
+- id: symbiosip-chi-2027
+  title: 'SymbioSip: Towards Understanding the Design of Human-Plant Mutual Care through a Bidirectional Hydration System'
+  authors:
+    - Luo, H.
+    - Wang, X.
+    - Balasooriya, P.
+    - Pathirana, R.O.
+    - Wang, H.
+    - Yan, Z.
+    - Elvitigala, D.S.
+    - Mueller, F.
+  venue: ACM CHI
+  year: 2027
+  type: paper
+  status: under-review

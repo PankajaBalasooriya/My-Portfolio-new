@@ -20,13 +20,20 @@ export const site = {
   /**
    * The hero's role line, rendered as "<study> · <affiliation>".
    * Keep each part short — it sits on one or two lines under the tagline.
+   *
+   * `affiliation` is empty while there is no current post: the Exertion Games
+   * Lab internship ended in June 2026, and the hero should not imply otherwise.
+   * Set it again on the next one and the separator comes back on its own.
    */
   role: {
     study: 'Final-year Electronic & Telecommunication Engineering, University of Moratuwa',
-    affiliation: 'Research intern, Exertion Games Lab',
+    affiliation: '' as string,
   },
-  /** Used for schema.org jobTitle. */
-  jobTitle: 'Research Intern',
+  /**
+   * Used for schema.org jobTitle. Tracks what is true now, not the last role
+   * held — the degree is still in progress, the internship is not.
+   */
+  jobTitle: 'Undergraduate Researcher',
   /**
    * Optional. Shown in the About page's at-a-glance block when set, and left
    * out entirely when empty — deliberately blank rather than guessed.

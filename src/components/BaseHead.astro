@@ -49,16 +49,14 @@ const personSchema = {
   description: site.description,
   jobTitle: site.jobTitle,
   image: absoluteFromPathname(portrait.src, Astro.site),
+  // The lab is deliberately absent: `affiliation` reads as a standing tie, and
+  // the Exertion Games Lab internship ended in June 2026. The work itself is
+  // still on /about and /cv, where it carries its dates.
   affiliation: [
     {
       '@type': 'CollegeOrUniversity',
       name: site.organizations.university.name,
       url: site.organizations.university.url,
-    },
-    {
-      '@type': 'Organization',
-      name: site.organizations.lab.name,
-      url: site.organizations.lab.url,
     },
   ],
   knowsAbout: [...site.knowsAbout],

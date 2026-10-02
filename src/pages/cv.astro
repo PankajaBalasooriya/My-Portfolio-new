@@ -130,7 +130,9 @@ const certificates = await getCertificates();
                     <p class="font-medium">{entry.data.title}</p>
                     <p class="text-muted">{entry.data.authors.join(', ')}</p>
                     <p class="text-muted">
-                      <cite class="not-italic">{entry.data.venue}</cite> · {entry.data.type}
+                      <cite class="not-italic">{entry.data.venue}</cite>
+                      {entry.data.pages && <span> pp. {entry.data.pages}</span>} ·{' '}
+                      {entry.data.type}
                       {entry.data.doi && <span class="cv-doi"> · doi:{entry.data.doi}</span>}
                     </p>
                   </div>
