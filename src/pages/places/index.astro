@@ -18,6 +18,8 @@ const upcoming = places.filter(isUpcomingPlace);
 const groups = groupPlacesByYear(visited);
 const stats = getPlacesStats(places);
 const samplesOnly = places.length > 0 && places.every((place) => place.data.placeholder);
+/** The globe stays either way; the stats, filters and list have nothing to say. */
+const hasPlaces = places.length > 0;
 ---
 
 <PageLayout
@@ -37,13 +39,27 @@ const samplesOnly = places.length > 0 && places.every((place) => place.data.plac
 
   <PlacesGlobe places={places} />
 
-  <div class="mt-12">
-    <PlacesStats {...stats} />
-  </div>
+  {
+    !hasPlaces && (
+      <p class="mt-12 max-w-[60ch] border-t border-border pt-6 text-muted">
+        The pins come later. The globe turns regardless.
+      </p>
+    )
+  }
 
-  <div class="mt-12">
-    <PlaceFilters />
-  </div>
+  {
+    hasPlaces && (
+      <>
+        <div class="mt-12">
+          <PlacesStats {...stats} />
+        </div>
+
+        <div class="mt-12">
+          <PlaceFilters />
+        </div>
+      </>
+    )
+  }
 
   <div class="mt-10 space-y-14" data-place-groups>
     {

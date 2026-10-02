@@ -7,6 +7,8 @@ interface Props {
 }
 
 const { places } = Astro.props as Props;
+/** With no markers, half the caption describes controls that do nothing. */
+const hasPlaces = places.length > 0;
 const globePlaces = places.map((place) => ({
   id: place.id.replace(/[^a-zA-Z0-9_-]/g, '-'),
   title: place.data.title,
@@ -22,10 +24,13 @@ const globePlaces = places.map((place) => ({
     <div>
       <h2 id="places-globe-title" class="text-xl">Journey globe</h2>
       <p class="mt-1 max-w-[58ch] text-sm text-muted">
-        Drag and release to glide. Scroll or pinch to zoom. Selecting a place below brings its marker into view.
+        Drag and release to glide. Scroll or pinch to zoom.{' '}
+        {hasPlaces && 'Selecting a place below brings its marker into view.'}
       </p>
     </div>
-    <p class="hidden text-xs text-faint sm:block" aria-hidden="true">City-level markers</p>
+    {hasPlaces && (
+      <p class="hidden text-xs text-faint sm:block" aria-hidden="true">City-level markers</p>
+    )}
   </div>
 
   <div

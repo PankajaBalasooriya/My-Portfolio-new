@@ -55,9 +55,19 @@ export function isUpcomingPlace(place: PlaceEntry): boolean {
   return place.data.visits.every((visit) => visit.status === 'upcoming');
 }
 
-/** Production places, newest visit first. Drafts remain available in local dev. */
+/**
+ * Production places, newest visit first.
+ *
+ * Drafts remain available in local dev, and `placeholder: true` entries follow
+ * the same rule. Those are kept in the repository as worked examples of the
+ * schema, gallery and video handling, but they carry sample stories and sample
+ * artwork, so they must never reach the live site.
+ */
 export async function getPlaces(): Promise<PlaceEntry[]> {
-  const places = await getCollection('places', ({ data }) => includeDrafts || !data.draft);
+  const places = await getCollection(
+    'places',
+    ({ data }) => includeDrafts || (!data.draft && !data.placeholder),
+  );
   return places.sort((a, b) => latestVisit(b).start.localeCompare(latestVisit(a).start));
 }
 
