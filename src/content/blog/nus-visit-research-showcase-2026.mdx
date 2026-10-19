@@ -1,0 +1,126 @@
+---
+title: 'Three drones, one beam, and a room full of strangers'
+description: >-
+  Presenting our cooperative multi-drone payload transport project at the
+  research showcase for the NUS academic visit to Moratuwa, and what three
+  hours of explaining it to people outside the field did to the way I describe
+  the work.
+pubDate: 2026-10-19
+tags: ['drones', 'reinforcement-learning', 'research', 'talks']
+draft: true
+heroImage: ../../assets/blog/nus-showcase-table.jpg
+heroAlt: >-
+  A quadcopter on a lab bench beside a laptop running a simulation and a
+  monitor showing the project poster.
+---
+
+import ZoomableFigure from '../../components/ZoomableFigure.astro';
+import poster from '../../assets/blog/nus-showcase-poster.png';
+
+On 13 October the Department of Computer Science and Engineering ran a research
+showcase in the GTN Lab for a visiting group from the National University of
+Singapore. Three hours, a room of digital posters, and a steady stream of
+people walking up to ask what you are doing. Our project — cooperative
+multi-drone payload transport with learning-based distributed control — had a
+table near the window.
+
+This is what I took away from it, which is mostly not about the drones.
+
+## The event
+
+The showcase sits on top of an agreement NUS signed with Sri Lanka's Ministry
+of Education in January 2025, driven by Assoc Prof Suranga Nanayakkara. A
+delegation from NUS Computing first came through Sri Lanka at the end of
+October 2025 to meet prospective PhD students and talk to university
+leadership, and the Department has hosted student work for visiting NUS
+academics since. This year's version was ours.
+
+The format was deliberately low-ceremony: posters shown on screens rather than
+printed, a table each, and no scheduled talks. You stand next to your work and
+people come to you. Setup was from 8:30, doors at 9:00, and by about 9:20 the
+room was loud.
+
+{/* TODO: names of the NUS academics you actually spoke to, and anything
+     specific they said. I only have the general context, not the room. */}
+
+## The project, in the two minutes you actually get
+
+One drone cannot lift a heavy or awkward load. Three can, if they cooperate.
+The hard part is not the lifting — it is controlling the load's full 6-DoF
+pose, position and orientation together, so a steel beam arrives level and
+where you meant it rather than swinging on its cables.
+
+Our approach is decentralised. Each drone runs its own policy and makes its own
+decisions; there is no central controller holding the formation together and no
+drone-to-drone communication. The payload broadcasts its own position and
+orientation, and each drone reacts to that. That is the only shared signal.
+The policies are trained cooperatively with multi-agent reinforcement learning
+in simulation, then transferred to hardware.
+
+<ZoomableFigure
+  src={poster}
+  alt="The project poster: problem and motivation, approach, system overview with three quadcopters and a payload, and training and flight results."
+  caption="The poster as it ran on the screen. 16:9, because the venue supplied monitors rather than board space. Click it to read the panels."
+/>
+
+The results panel shows payload position and orientation error converging
+across three training configurations that vary the drone platform, the cable
+rod length and the speed cap, plus a real flight tracking a figure-eight under
+the RAPTOR controller. That last image did more work than everything else on
+the poster. People believe a trajectory they can see.
+
+## What the questions were actually about
+
+I had prepared for questions about the learning setup — reward shaping, the
+sim-to-real gap, why multi-agent rather than a single policy over a joint
+action space. A few of those came. Most did not.
+
+What people asked instead:
+
+- **Why no communication between the drones?** The most common question by
+  some distance, and the one I had the least rehearsed answer to on the poster.
+  The honest version is that communication is a failure mode: links drop,
+  latency varies, and a policy that depends on a message it did not receive
+  behaves badly. Implicit coordination through the shared payload state is
+  weaker but does not have that cliff.
+- **What happens when one drone fails?** Fair, and we do not have a clean
+  answer yet.
+- **Does it work outside?** Yes — the figure-eight is a real flight. This
+  usually ended the technical part of the conversation, which told me something
+  about which evidence counts.
+- **What is it for?** Construction, disaster response, moving things to places
+  without roads. Asked almost every time, and I never had a short answer I was
+  happy with.
+
+{/* TODO: add the one or two questions that genuinely caught you off guard.
+     Those are the most interesting part of a post like this and I don't
+     know them. */}
+
+## The thing I would do differently
+
+The poster is written for someone who already knows what a quadcopter policy
+is. It is not a bad poster — the brief asked for something legible to technical
+and non-technical audiences, and the problem panel does that much. But the
+middle of it assumes the reader will give you four minutes, and in a room like
+this nobody gives you four minutes until you have earned them in forty seconds.
+
+What earned them, every time, was the physical drone on the table. People
+stopped for the hardware and stayed for the poster, never the other way around.
+If I run a table like this again, the demo goes in front and the poster becomes
+the thing I point at once someone is already asking.
+
+The second thing: I explained the system three different ways over three hours
+and the last version was much better than the first. Standing in a room
+repeating yourself to people who do not share your assumptions is a fast way to
+find out which parts of your explanation were load-bearing and which were
+habit. That is worth more than the feedback itself.
+
+## Credits
+
+The project is work by Mugesram Krishnakumar, Kiran Gunathilaka, G.A.M.I.K.
+Bandara and me, supervised by Dr. Peshala Jayasekara in the Department of
+Electronic and Telecommunication Engineering, with Deepana Ishtaweera at the
+Robotic Systems Lab, ETH Zürich, co-supervising.
+
+{/* TODO: link the project page here once the case study is written, and the
+     repo if it is going public. */}
