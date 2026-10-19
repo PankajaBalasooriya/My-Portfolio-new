@@ -1,0 +1,406 @@
+---
+/**
+ * A figure whose image opens full-screen on click, with pan and zoom.
+ *
+ * Progressive enhancement: without JS the trigger is a plain link to the
+ * original asset, which the browser shows at full resolution with its own
+ * pan and zoom. With JS it opens a native <dialog> instead, which gets Esc
+ * and focus trapping for free. Dense images — posters, schematics, plots —
+ * are unreadable at body width, and fitting one to the viewport is often
+ * still not enough, hence the zoom.
+ */
+import { Image } from 'astro:assets';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  /** Rendered as the <figcaption>. Omit for an uncaptioned figure. */
+  caption?: string;
+  widths?: number[];
+  sizes?: string;
+}
+
+const {
+  src,
+  alt,
+  caption,
+  widths = [640, 1080, 1600],
+  sizes = '(min-width: 768px) 48rem, 100vw',
+} = Astro.props as Props;
+
+const BAR_BUTTON =
+  'cursor-pointer rounded-md px-2 py-1 text-white/80 transition-colors hover:text-white disabled:cursor-default disabled:opacity-35 disabled:hover:text-white/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white';
+---
+
+<figure data-zoom-figure>
+  <a
+    href={src.src}
+    data-zoom-trigger
+    class="group/zoom relative block cursor-zoom-in rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+  >
+    <Image src={src} alt={alt} widths={widths} sizes={sizes} />
+
+    <span
+      aria-hidden="true"
+      class="pointer-events-none absolute right-3 bottom-3 rounded-md bg-bg/90 px-2 py-1 text-xs text-muted opacity-0 transition-opacity group-hover/zoom:opacity-100 group-focus-visible/zoom:opacity-100"
+    >
+      Click to enlarge
+    </span>
+  </a>
+
+  {caption && <figcaption>{caption}</figcaption>}
+
+  <dialog data-zoom-dialog aria-label={alt}>
+    <div class="flex h-full w-full flex-col">
+      <div class="flex shrink-0 items-center justify-end gap-2 px-4 py-3">
+        <p class="mr-auto hidden text-xs text-white/50 sm:block">
+          Scroll or click to zoom, drag to pan.
+        </p>
+
+        <button type="button" data-zoom-out aria-label="Zoom out" class={BAR_BUTTON}>
+          <span aria-hidden="true" class="text-xl leading-none">&minus;</span>
+        </button>
+
+        <output
+          data-zoom-level
+          aria-live="polite"
+          class="w-12 text-center text-xs tabular-nums text-white/60">100%</output
+        >
+
+        <button type="button" data-zoom-in aria-label="Zoom in" class={BAR_BUTTON}>
+          <span aria-hidden="true" class="text-xl leading-none">+</span>
+        </button>
+
+        <a
+          href={src.src}
+          target="_blank"
+          rel="noopener"
+          class="ml-2 text-sm text-white/80 underline decoration-1 underline-offset-4 transition-colors hover:text-white"
+        >
+          Open full size
+        </a>
+
+        <button
+          type="button"
+          data-zoom-close
+          aria-label="Close"
+          class={`${BAR_BUTTON} ml-2 text-2xl leading-none`}
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div data-zoom-stage class="flex min-h-0 flex-1 items-center justify-center p-4 pt-0">
+        <div data-zoom-viewport class="relative h-full w-full overflow-hidden">
+          <Image
+            src={src}
+            alt={alt}
+            widths={[1200, 1600, 2000]}
+            sizes="95vw"
+            loading="lazy"
+            data-zoom-image
+            draggable={false}
+            class="h-full w-full object-contain"
+          />
+        </div>
+      </div>
+    </div>
+  </dialog>
+</figure>
+
+<style>
+  /*
+   * The UA sizes a dialog to its content and centres it in the viewport, and
+   * Tailwind's utilities land on the wrong side of that. Stating the geometry
+   * outright is shorter than fighting it.
+   */
+  dialog[data-zoom-dialog] {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  dialog[data-zoom-dialog]::backdrop {
+    background: rgb(0 0 0 / 0.88);
+  }
+
+  /* Prose sets margins on figure images; the dialog copy must not inherit them. */
+  dialog[data-zoom-dialog] img {
+    margin: 0;
+  }
+
+  /* The browser's own pan and pinch would fight the handlers below. */
+  [data-zoom-viewport] {
+    touch-action: none;
+  }
+
+  [data-zoom-image] {
+    transform-origin: center center;
+    will-change: transform;
+    /*
+     * Without this the browser starts its own image drag the moment a pan
+     * begins, which eats the pointermove stream and the image never moves.
+     */
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+
+  [data-zoom-viewport][data-zoomed='false'] [data-zoom-image] {
+    cursor: zoom-in;
+  }
+
+  [data-zoom-viewport][data-zoomed='true'] [data-zoom-image] {
+    cursor: grab;
+  }
+
+  [data-zoom-viewport][data-dragging='true'] [data-zoom-image] {
+    cursor: grabbing;
+  }
+</style>
+
+<script>
+  const MIN_SCALE = 1;
+  const MAX_SCALE = 8;
+  /** Below this much pointer travel, a drag counts as a click. */
+  const DRAG_SLOP = 5;
+
+  for (const figure of document.querySelectorAll<HTMLElement>('[data-zoom-figure]')) {
+    const trigger = figure.querySelector<HTMLAnchorElement>('[data-zoom-trigger]');
+    const dialog = figure.querySelector<HTMLDialogElement>('[data-zoom-dialog]');
+    if (!trigger || !dialog || typeof dialog.showModal !== 'function') continue;
+
+    // Out of the prose container, so no ancestor typography reaches the overlay.
+    document.body.appendChild(dialog);
+
+    const stage = dialog.querySelector<HTMLElement>('[data-zoom-stage]')!;
+    const viewport = dialog.querySelector<HTMLElement>('[data-zoom-viewport]')!;
+    const image = dialog.querySelector<HTMLImageElement>('[data-zoom-image]')!;
+    const level = dialog.querySelector<HTMLElement>('[data-zoom-level]')!;
+    const zoomInButton = dialog.querySelector<HTMLButtonElement>('[data-zoom-in]')!;
+    const zoomOutButton = dialog.querySelector<HTMLButtonElement>('[data-zoom-out]')!;
+
+    let scale = 1;
+    let tx = 0;
+    let ty = 0;
+
+    /**
+     * The painted box at scale 1. The <img> fills the viewport and letterboxes
+     * with object-contain, so the element's own rect is the wrong thing to
+     * measure — the contain result has to be worked out from the aspect ratio.
+     */
+    function fittedSize() {
+      const ratio =
+        (Number(image.getAttribute('width')) || image.naturalWidth || 1) /
+        (Number(image.getAttribute('height')) || image.naturalHeight || 1);
+      const vw = viewport.clientWidth;
+      const vh = viewport.clientHeight;
+      let width = vw;
+      let height = vw / ratio;
+      if (height > vh) {
+        height = vh;
+        width = vh * ratio;
+      }
+      return { width, height };
+    }
+
+    function render() {
+      // Keep the image covering the viewport: no dragging it off into space.
+      const { width, height } = fittedSize();
+      const maxX = Math.max(0, (width * scale - viewport.clientWidth) / 2);
+      const maxY = Math.max(0, (height * scale - viewport.clientHeight) / 2);
+      tx = Math.min(maxX, Math.max(-maxX, tx));
+      ty = Math.min(maxY, Math.max(-maxY, ty));
+
+      image.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+      viewport.dataset.zoomed = String(scale > MIN_SCALE);
+      level.textContent = `${Math.round(scale * 100)}%`;
+      zoomInButton.disabled = scale >= MAX_SCALE;
+      zoomOutButton.disabled = scale <= MIN_SCALE;
+    }
+
+    /** Zoom to `next`, holding the point (cx, cy) — viewport centre origin — still. */
+    function zoomTo(next: number, cx = 0, cy = 0) {
+      const clamped = Math.min(MAX_SCALE, Math.max(MIN_SCALE, next));
+      const factor = clamped / scale;
+      tx = cx - (cx - tx) * factor;
+      ty = cy - (cy - ty) * factor;
+      scale = clamped;
+      if (scale === MIN_SCALE) {
+        tx = 0;
+        ty = 0;
+      }
+      render();
+    }
+
+    function reset() {
+      scale = 1;
+      tx = 0;
+      ty = 0;
+      render();
+    }
+
+    /** Pointer position relative to the viewport centre, which the transform uses. */
+    function toCentre(event: { clientX: number; clientY: number }) {
+      const rect = viewport.getBoundingClientRect();
+      return {
+        cx: event.clientX - rect.left - rect.width / 2,
+        cy: event.clientY - rect.top - rect.height / 2,
+      };
+    }
+
+    /* ---------------------------------------------------------------- open */
+
+    trigger.addEventListener('click', (event) => {
+      // Let modified clicks through so "open in new tab" still works.
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+      event.preventDefault();
+      reset();
+      dialog.showModal();
+      render();
+    });
+
+    /* --------------------------------------------------------------- close */
+
+    dialog
+      .querySelector<HTMLButtonElement>('[data-zoom-close]')
+      ?.addEventListener('click', () => dialog.close());
+
+    // The backdrop reports the dialog itself as the target; the stage is
+    // padding around the image, so clicking there should close too. A click
+    // on the image itself toggles zoom instead, handled below.
+    dialog.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      if (target === dialog || target === stage) dialog.close();
+    });
+
+    dialog.addEventListener('close', () => {
+      reset();
+      trigger.focus();
+    });
+
+    /* ------------------------------------------------------------- toolbar */
+
+    zoomInButton.addEventListener('click', () => zoomTo(scale * 1.5));
+    zoomOutButton.addEventListener('click', () => zoomTo(scale / 1.5));
+
+    /* --------------------------------------------------------------- wheel */
+
+    viewport.addEventListener(
+      'wheel',
+      (event) => {
+        event.preventDefault();
+        const { cx, cy } = toCentre(event);
+        // Trackpad pinch arrives as a ctrl-held wheel; both want the same thing.
+        zoomTo(scale * Math.exp(-event.deltaY * 0.002), cx, cy);
+      },
+      { passive: false },
+    );
+
+    /* ------------------------------------------------- drag, pinch, tap */
+
+    const points = new Map<number, { x: number; y: number }>();
+    let travel = 0;
+    let dragged = false;
+    let pinchStart: { distance: number; scale: number } | null = null;
+
+    function spread() {
+      const [a, b] = [...points.values()];
+      return Math.hypot(a.x - b.x, a.y - b.y);
+    }
+
+    // Belt and braces with draggable={false}: Firefox still fires dragstart
+    // for a press-and-move over an image. preventDefault here rather than on
+    // pointerdown, which would suppress the click that toggles zoom.
+    viewport.addEventListener('dragstart', (event) => event.preventDefault());
+
+    viewport.addEventListener('pointerdown', (event) => {
+      points.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      travel = 0;
+      if (points.size === 2) pinchStart = { distance: spread(), scale };
+      if (points.size === 1 && scale > MIN_SCALE) viewport.dataset.dragging = 'true';
+
+      // Capture keeps the pan alive when the pointer leaves the viewport, but
+      // it throws for a pointer the browser does not consider active. That
+      // must not take the pan down with it, hence last and guarded.
+      try {
+        viewport.setPointerCapture(event.pointerId);
+      } catch {
+        /* panning still works, it just stops at the viewport edge */
+      }
+    });
+
+    viewport.addEventListener('pointermove', (event) => {
+      const previous = points.get(event.pointerId);
+      if (!previous) return;
+      const dx = event.clientX - previous.x;
+      const dy = event.clientY - previous.y;
+      points.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      travel += Math.hypot(dx, dy);
+
+      if (points.size === 2 && pinchStart) {
+        const distance = spread();
+        if (pinchStart.distance > 0) {
+          const [a, b] = [...points.values()];
+          const { cx, cy } = toCentre({
+            clientX: (a.x + b.x) / 2,
+            clientY: (a.y + b.y) / 2,
+          });
+          zoomTo((pinchStart.scale * distance) / pinchStart.distance, cx, cy);
+        }
+        return;
+      }
+
+      if (points.size === 1 && scale > MIN_SCALE) {
+        tx += dx;
+        ty += dy;
+        render();
+      }
+    });
+
+    function endPointer(event: PointerEvent) {
+      points.delete(event.pointerId);
+      if (points.size < 2) pinchStart = null;
+      if (points.size === 0) {
+        viewport.dataset.dragging = 'false';
+        dragged = travel > DRAG_SLOP;
+      }
+    }
+
+    viewport.addEventListener('pointerup', endPointer);
+    viewport.addEventListener('pointercancel', endPointer);
+
+    // A tap on the image zooms in at that point, or back out if already zoomed.
+    // The suppression after a drag is one-shot, so a pan cannot leave later
+    // taps dead.
+    viewport.addEventListener('click', (event) => {
+      if (dragged) {
+        dragged = false;
+        return;
+      }
+      const { cx, cy } = toCentre(event);
+      zoomTo(scale > MIN_SCALE ? MIN_SCALE : 2.5, cx, cy);
+    });
+
+    /* ------------------------------------------------------------ keyboard */
+
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key === '+' || event.key === '=') zoomTo(scale * 1.5);
+      else if (event.key === '-') zoomTo(scale / 1.5);
+      else if (event.key === '0') reset();
+      else return;
+      event.preventDefault();
+    });
+
+    window.addEventListener('resize', () => {
+      if (dialog.open) render();
+    });
+  }
+</script>
