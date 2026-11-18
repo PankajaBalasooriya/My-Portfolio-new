@@ -8,11 +8,24 @@
 
 const BASE = import.meta.env.BASE_URL;
 
-/** Join a site-root-relative path onto the configured base path. */
+/**
+ * Join a site-root-relative path onto the configured base path.
+ *
+ * GitHub Pages serves routes from `<route>/index.html` and 301-redirects
+ * `/<route>` to `/<route>/`. Appending a trailing slash on route paths (anything
+ * whose final segment has no file extension) keeps internal links, canonical
+ * URLs, and the sitemap identical so crawlers never hit a redirect hop.
+ */
 export function url(path = '/'): string {
   const base = BASE.endsWith('/') ? BASE.slice(0, -1) : BASE;
   const suffix = path.startsWith('/') ? path : `/${path}`;
-  const joined = `${base}${suffix}`;
+  const match = suffix.match(/^([^?#]*)(.*)$/);
+  const pathname = match ? match[1] : suffix;
+  const rest = match ? match[2] : '';
+  const lastSegment = pathname.split('/').pop() ?? '';
+  const withSlash =
+    pathname.endsWith('/') || lastSegment.includes('.') ? pathname : `${pathname}/`;
+  const joined = `${base}${withSlash}${rest}`;
   return joined === '' ? '/' : joined;
 }
 

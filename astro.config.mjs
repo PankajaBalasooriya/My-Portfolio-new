@@ -13,7 +13,7 @@ export default defineConfig({
   site,
   base,
   output: 'static',
-  trailingSlash: 'ignore',
+  trailingSlash: 'always',
   integrations: [mdx(), sitemap()],
   vite: { plugins: [tailwindcss()] },
   markdown: {
