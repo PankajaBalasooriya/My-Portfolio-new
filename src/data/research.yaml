@@ -45,38 +45,9 @@
     - Sabnis, N.
     - Mueller, F.
     - Elvitigala, D.S.
-  venue: SportsHCI
+  venue: ACM SportsHCI Companion
   year: 2026
   type: demo
-  status: accepted
-
-- id: copsense-chi-2027
-  title: 'CoPSense: Improving control over user''s Center of Pressure using passive vibrotactile feedback'
-  authors:
-    - Pathirana, R.O.
-    - Balasooriya, P.
-    - Ravishan, N.
-    - Warushavithana, N.D.
-    - Mueller, F.
-    - Sabnis, N.
-    - Elvitigala, D.S.
-  venue: ACM CHI
-  year: 2027
-  type: paper
-  status: under-review
-
-- id: symbiosip-chi-2027
-  title: 'SymbioSip: Towards Understanding the Design of Human-Plant Mutual Care through a Bidirectional Hydration System'
-  authors:
-    - Luo, H.
-    - Wang, X.
-    - Balasooriya, P.
-    - Pathirana, R.O.
-    - Wang, H.
-    - Yan, Z.
-    - Elvitigala, D.S.
-    - Mueller, F.
-  venue: ACM CHI
-  year: 2027
-  type: paper
-  status: under-review
+  status: published
+  doi: 10.1145/3801727.3844936
+  pages: '1-5'
